@@ -1,0 +1,23 @@
+{
+  "kind": "singleType",
+  "collectionName": "datenschutzs",
+  "info": {
+    "singularName": "datenschutz",
+    "pluralName": "datenschutzs",
+    "displayName": "Datenschutz"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Titel": {
+      "type": "string",
+      "required": true
+    },
+    "Inhalt": {
+      "type": "richtext",
+      "required": true
+    }
+  }
+}

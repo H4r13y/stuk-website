@@ -1,0 +1,22 @@
+{
+  "name": "stuk-nuxt-app",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxtjs/strapi": "^1.12.0",
+    "marked": "^17.0.1",
+    "nuxt": "^3.15.3",
+    "vue": "latest"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "latest"
+  }
+}

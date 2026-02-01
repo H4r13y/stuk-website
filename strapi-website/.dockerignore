@@ -1,0 +1,51 @@
+# Node
+node_modules
+npm-debug.log
+
+# Strapi
+.strapi
+.strapi-updater.json
+.strapi-cloud.json
+dist
+build
+exports
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Logs
+logs
+*.log
+
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+.Spotlight-V100
+.Trashes
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Tests
+coverage
+.nyc_output
+
+# Environment (will be provided via docker-compose)
+.env.local
+.env.production
+
+# Misc
+.tmp
+*.pid

@@ -1,0 +1,109 @@
+############################
+# Secrets & Environment
+############################
+
+# Environment files with secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.p12
+id.env
+
+# API keys and credentials
+secrets/
+credentials/
+*.secret
+config.local.*
+
+############################
+# Project Specific
+############################
+
+# Excluded directories
+StuK-Site/
+.claude/
+tools/
+
+############################
+# Docker
+############################
+
+# Docker volumes and data
+postgres-data/
+.docker/
+docker-data/
+
+############################
+# Logs and databases
+############################
+
+*.log
+*.sql
+*.sqlite
+*.sqlite3
+logs/
+
+############################
+# OS
+############################
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.directory
+
+############################
+# IDE & Editors
+############################
+
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+*.swm
+.vim/
+*.sublime-*
+
+############################
+# Node.js
+############################
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp.*
+.yarn/
+dist/
+build/
+.nuxt/
+.output/
+.cache/
+
+############################
+# Temporary & Build
+############################
+
+tmp/
+temp/
+*.tmp
+*.bak
+*.cache
