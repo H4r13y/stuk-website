@@ -43,18 +43,14 @@ services:
     environment:
       HOST: 0.0.0.0
       PORT: 1337
-
-      # WICHTIG: Prod-Modus
       NODE_ENV: production
 
-      # Secrets
       APP_KEYS: ${APP_KEYS}
       API_TOKEN_SALT: ${API_TOKEN_SALT}
       ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
       TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
 
-      # DB
       DATABASE_CLIENT: postgres
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432
@@ -62,14 +58,7 @@ services:
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_SSL: "false"
-
-      # Optional aber oft hilfreich hinter Reverse Proxy:
-      # STRAPI_URL: https://api.stuk.dev
-      # Diese Variable nutzt Strapi nicht automatisch überall – du kannst sie in deiner Strapi-Config verwenden.
-      STRAPI_URL: ${STRAPI_URL}
-
     volumes:
-      # Uploads persistent (sonst gehen Medien bei Rebuild verloren)
       - strapi-uploads:/opt/app/public/uploads
     networks:
       - stuk-network
@@ -85,8 +74,7 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      # Nuxt soll Strapi über die öffentliche API-URL kennen (für SSR/Client gleich)
-      STRAPI_URL: ${PUBLIC_API_URL}
+      NUXT_PUBLIC_STRAPI_URL: https://api.stuk.dev
     networks:
       - stuk-network
     depends_on:
