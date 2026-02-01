@@ -241,12 +241,11 @@ const formatTime = (dateString: string) => {
 }
 
 // Fetch labels from Strapi
+const config = useRuntimeConfig()
+const strapiUrl = config.public.strapiUrl
+
 const fetchLabels = async () => {
   try {
-    const strapiUrl = process.client
-      ? 'http://localhost:1337' // Browser
-      : (process.env.STRAPI_URL || 'http://strapi:1337') // Server/Docker
-
     const response = await $fetch(`${strapiUrl}/api/labels`)
     if (response && response.data) {
       // Extract label names and sort them
@@ -264,11 +263,6 @@ const fetchLabels = async () => {
 const fetchEvents = async () => {
   loading.value = true
   try {
-    // Use env variable or fallback to localhost
-    const strapiUrl = process.client
-      ? 'http://localhost:1337' // Browser
-      : (process.env.STRAPI_URL || 'http://strapi:1337') // Server/Docker
-
     const now = new Date().toISOString()
     const in31Days = new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString()
 
