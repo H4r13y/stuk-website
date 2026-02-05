@@ -377,12 +377,12 @@ footer {
 
 /* Mobile: move nav to bottom when opted in */
 @media (max-width: 640px) {
-  body.has-bottom-nav {
+  .has-bottom-nav {
     padding-top: 0;
     padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px))
   }
 
-  body.has-bottom-nav .site-header {
+  .has-bottom-nav .site-header {
     position: fixed;
     top: auto;
     bottom: 0;
@@ -395,49 +395,61 @@ footer {
     border-bottom: none
   }
 
-  body.has-bottom-nav .site-header .container.nav {
-    padding: 12px 16px;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px
+  .has-bottom-nav .site-header .container.nav {
+    padding: 10px 6px !important;
+    padding-inline: 6px !important;
+    justify-content: space-evenly;
+    flex-wrap: nowrap;
+    gap: 4px;
+    height: auto;
+    max-width: 100%;
   }
 
-  body.has-bottom-nav .site-header .logo {
+  .has-bottom-nav .site-header .logo {
     order: 1;
-    padding: 6px
+    padding: 0;
+    inline-size: 32px;
+    block-size: 32px;
+    flex: 0 0 auto;
   }
 
-  body.has-bottom-nav .site-header .logo img {
-    width: 36px;
-    height: 36px;
-    opacity: 1
+  .has-bottom-nav .site-header .logo img {
+    width: 100%;
+    height: 100%;
   }
 
-  body.has-bottom-nav .site-header nav.primary {
+  .has-bottom-nav .site-header nav.primary {
     display: flex;
-    gap: 6px;
-    order: 2
+    gap: 4px;
+    order: 2;
+    flex: 0 0 auto;
   }
 
-  body.has-bottom-nav .site-header nav.primary a {
-    font-size: 0.8rem;
-    padding: 8px 10px;
-    white-space: nowrap
+  .has-bottom-nav .site-header nav.primary a {
+    font-size: 0.85rem;
+    padding: 10px 10px;
+    white-space: nowrap;
   }
 
-  body.has-bottom-nav .site-header .spacer {
-    display: none
+  .has-bottom-nav .site-header .spacer {
+    display: none;
   }
 
-  body.has-bottom-nav .site-header .btn.ghost {
-    font-size: 0.8rem;
-    padding: 8px 12px;
-    order: 3
+  .has-bottom-nav .site-header .btn.ghost {
+    font-size: 0.85rem;
+    padding: 10px 12px;
+    order: 3;
+    flex: 0 0 auto;
+    min-width: auto;
+    min-height: auto;
   }
 
-  body.has-bottom-nav .site-header .btn:not(.ghost) {
-    font-size: 0.8rem;
-    padding: 8px 12px;
-    order: 4
+  .has-bottom-nav .site-header .btn:not(.ghost) {
+    font-size: 0.85rem;
+    padding: 10px 12px;
+    order: 4;
+    flex: 0 0 auto;
+    min-width: auto;
+    min-height: auto;
   }
 }
