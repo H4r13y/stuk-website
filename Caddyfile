@@ -1,5 +1,9 @@
 stuk.dev {
   encode zstd gzip
+  
+  basicauth /* {
+    user $2a$14$M0MUP.YcpKjN7Clju/axIeiot1kAJxU53E8E2Ls05DSAkgmQ.aFp.
+  }
   reverse_proxy nuxt:3000
 }
 

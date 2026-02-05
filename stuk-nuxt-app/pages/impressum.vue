@@ -74,9 +74,8 @@
 </template>
 
 <script setup lang="ts">
-const strapiUrl = process.client
-  ? 'http://localhost:1337' // Browser
-  : (process.env.STRAPI_URL || 'http://strapi:1337') // Server/Docker
+const config = useRuntimeConfig()
+const strapiUrl = config.public.strapiUrl
 
 const { data: impressum, pending, error } = await useAsyncData(
   'impressum',
