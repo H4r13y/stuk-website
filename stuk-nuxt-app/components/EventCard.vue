@@ -2,12 +2,12 @@
   <article class="card" :data-variant="variant">
     <div class="date-badge">
       <b>{{ formattedDate }}</b>
-      <small>{{ formattedTime }}</small>
+      <small class="time-mobile">{{ formattedTime }}</small>
     </div>
 
     <div class="body">
       <h3>{{ event.title }}</h3>
-      <p class="sub" style="margin:0">
+      <p class="sub description-desktop" style="margin:0">
         {{ event.description || "Mehr Infos folgen bald!" }}
       </p>
     </div>
@@ -73,5 +73,40 @@ const formattedTime = computed(() => {
   font-size: 0.85rem;
   color: #a7abb2;
   font-weight: 500;
+}
+
+/* Mobile Optimierungen */
+@media (max-width: 640px) {
+  /* Description auf Mobile verstecken */
+  .description-desktop {
+    display: none !important;
+  }
+
+  /* Date Badge kompakter */
+  .date-badge {
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 10px;
+    align-items: flex-start;
+  }
+
+  .date-badge b {
+    font-size: 0.85rem;
+  }
+
+  .time-mobile {
+    font-size: 0.7rem;
+  }
+
+  /* Card-Body kompakter */
+  .card .body {
+    padding: 10px;
+  }
+
+  .card .body h3 {
+    font-size: 0.95rem;
+    line-height: 1.3;
+    margin: 0;
+  }
 }
 </style>

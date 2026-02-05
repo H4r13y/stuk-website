@@ -1,7 +1,35 @@
 <template>
   <section class="container" id="events">
     <header class="controls" aria-label="Event-Filter">
-      <div class="chips" role="group" aria-label="Formate">
+      <!-- Mobile Filter Button (nur auf Smartphone sichtbar) -->
+      <button class="filter-toggle-mobile" @click="showFilterModal = !showFilterModal">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="6" x2="20" y2="6" />
+          <line x1="4" y1="12" x2="20" y2="12" />
+          <line x1="4" y1="18" x2="20" y2="18" />
+        </svg>
+        Filter
+        <span v-if="activeFilters.length > 0" class="filter-count">{{ activeFilters.length }}</span>
+      </button>
+
+      <!-- Aktive Filter Anzeige (Mobile) -->
+      <div v-if="activeFilters.length > 0" class="active-filters-mobile">
+        <button
+          v-for="tag in activeFilters"
+          :key="tag"
+          class="chip active-chip"
+          @click="toggleFilter(tag)"
+        >
+          {{ tag }}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Desktop Filter (wie bisher) -->
+      <div class="chips chips-desktop" role="group" aria-label="Formate">
         <button
           v-for="tag in filterTags"
           :key="tag"
@@ -22,6 +50,41 @@
         Filter konnten nicht geladen werden.
       </p>
     </header>
+
+    <!-- Filter Modal (Mobile) -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showFilterModal" class="filter-modal-overlay" @click="showFilterModal = false">
+          <div class="filter-modal" @click.stop>
+            <div class="filter-modal-header">
+              <h3>Filter wählen</h3>
+              <button class="close-btn" @click="showFilterModal = false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div class="filter-modal-content">
+              <button
+                v-for="tag in filterTags"
+                :key="tag"
+                class="chip chip-modal"
+                :data-active="activeFilters.includes(tag)"
+                @click="toggleFilter(tag)"
+                :disabled="labelsPending || !!labelsError"
+              >
+                {{ tag }}
+              </button>
+            </div>
+            <div class="filter-modal-footer">
+              <button class="btn" @click="resetFilters">Filter löschen</button>
+              <button class="btn primary" @click="showFilterModal = false">Fertig</button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
 
     <div class="events" aria-live="polite">
       <p v-if="eventsPending" style="color: var(--muted); grid-column: 1/-1; text-align: center;">
@@ -71,6 +134,7 @@ const strapiUrl = config.public.strapiUrl
 
 // State
 const activeFilters = ref<string[]>([])
+const showFilterModal = ref(false)
 
 // Fetch: Labels (lazy load on client)
 const {
@@ -160,6 +224,233 @@ function resetFilters() {
   .controls {
     -webkit-backdrop-filter: blur(16px) saturate(1.3);
     backdrop-filter: blur(16px) saturate(1.3);
+  }
+}
+
+/* Mobile Filter Toggle Button */
+.filter-toggle-mobile {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: var(--brand-red);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.filter-toggle-mobile:hover {
+  background: #a02f2a;
+  transform: translateY(-1px);
+}
+
+.filter-count {
+  background: white;
+  color: var(--brand-red);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .filter-toggle-mobile {
+    display: flex;
+  }
+
+  .chips-desktop {
+    display: none !important;
+  }
+
+  .controls {
+    padding: 12px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* Active Filters Display (Mobile) */
+.active-filters-mobile {
+  display: none;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .active-filters-mobile {
+    display: flex;
+  }
+}
+
+.active-chip {
+  background: #21304d;
+  color: #fff;
+  border-color: #ffffff33;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.active-chip svg {
+  opacity: 0.7;
+}
+
+/* Filter Modal */
+.filter-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+@media (min-width: 641px) {
+  .filter-modal-overlay {
+    align-items: center;
+  }
+}
+
+.filter-modal {
+  background: #0f1013;
+  border: 1px solid #ffffff22;
+  border-radius: var(--radius) var(--radius) 0 0;
+  width: 100%;
+  max-width: 500px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.4);
+}
+
+@media (min-width: 641px) {
+  .filter-modal {
+    border-radius: var(--radius);
+    max-height: 70vh;
+  }
+}
+
+.filter-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #ffffff12;
+}
+
+.filter-modal-header h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.2rem;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.close-btn:hover {
+  color: var(--text);
+}
+
+.filter-modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-content: flex-start;
+}
+
+.chip-modal {
+  flex: 0 0 auto;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+}
+
+.filter-modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #ffffff12;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.filter-modal-footer .btn {
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+}
+
+.filter-modal-footer .btn:hover {
+  background: #ffffff08;
+}
+
+.filter-modal-footer .btn.primary {
+  background: var(--brand-red);
+  border-color: var(--brand-red);
+  color: white;
+}
+
+.filter-modal-footer .btn.primary:hover {
+  background: #a02f2a;
+}
+
+/* Modal Transitions */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.modal-enter-active .filter-modal,
+.modal-leave-active .filter-modal {
+  transition: transform 0.25s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-from .filter-modal {
+  transform: translateY(100%);
+}
+
+.modal-leave-to .filter-modal {
+  transform: translateY(100%);
+}
+
+@media (min-width: 641px) {
+  .modal-enter-from .filter-modal,
+  .modal-leave-to .filter-modal {
+    transform: translateY(20px) scale(0.95);
   }
 }
 
