@@ -74,55 +74,32 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed, watchEffect } from "vue"
+
 const config = useRuntimeConfig()
 const strapiUrl = config.public.strapiUrl
-
-const { data: datenschutz, pending, error } = await useAsyncData(
-  'datenschutz',
-  async () => {
-    try {
-      console.log('=== TRYING TO FETCH DATENSCHUTZ ===')
-      console.log('Strapi URL:', strapiUrl)
-      console.log('Full URL:', `${strapiUrl}/api/datenschutz`)
-
-      const response = await $fetch(`${strapiUrl}/api/datenschutz`)
-      console.log('SUCCESS! Response:', response)
-      return response
-    } catch (err: any) {
-      console.error('FETCH ERROR:', err)
-      console.error('Error status:', err.status)
-      console.error('Error message:', err.message)
-      console.error('Error data:', err.data)
-      throw err
-    }
-  }
-)
-
 const { renderMarkdown } = useMarkdown()
-const renderedContent = ref('')
+
+// client-only fetch: NICHT awaiten
+const { data: datenschutz, error, pending } = useFetch(`${strapiUrl}/api/datenschutz`, {
+  server: false,
+})
+
+const renderedContent = ref("")
 
 watchEffect(async () => {
-  console.log('=== DATENSCHUTZ WATCHEFFECT ===')
-  console.log('datenschutz.value:', datenschutz.value)
+  // nur im Browser rendern
+  if (!process.client) return
 
-  if (datenschutz.value?.data) {
-    console.log('FULL data object:', JSON.stringify(datenschutz.value.data, null, 2))
-    console.log('data keys:', Object.keys(datenschutz.value.data))
-    console.log('data.titel:', datenschutz.value.data.titel)
-    console.log('data.Titel:', datenschutz.value.data.Titel)
-    console.log('data.inhalt:', datenschutz.value.data.inhalt)
-    console.log('data.Inhalt:', datenschutz.value.data.Inhalt)
-
-    if (datenschutz.value.data.inhalt || datenschutz.value.data.Inhalt) {
-      const content = datenschutz.value.data.inhalt || datenschutz.value.data.Inhalt
-      renderedContent.value = await renderMarkdown(content)
-    }
-  }
+  const md = datenschutz.value?.data?.Inhalt
+  renderedContent.value = md ? await renderMarkdown(md) : ""
 })
 
 useHead({
-  title: datenschutz.value?.data?.titel
-    ? `StuK – ${datenschutz.value.data.titel}`
-    : 'StuK – Datenschutz'
+  title: computed(() =>
+    datenschutz.value?.data?.titel
+      ? `StuK – ${datenschutz.value.data.titel}`
+      : "StuK – Datenschutz"
+  ),
 })
 </script>

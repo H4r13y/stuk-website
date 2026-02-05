@@ -3,7 +3,7 @@ export default defineNuxtConfig({
 
   devtools: { enabled: true },
 
-  /**
+  /*
    * Runtime Config
    * - public: im Browser verfügbar
    * - default: lokal localhost, prod per ENV
@@ -16,16 +16,12 @@ export default defineNuxtConfig({
 
   modules: ['@nuxtjs/strapi'],
 
-  /**
-   * Strapi Modul Konfiguration
-   * WICHTIG:
-   * - url MUSS runtimeConfig verwenden
-   * - niemals localhost hardcoden für Prod
-   */
+  /* Strapi Modul Konfiguration */
   strapi: {
     url: process.env.NUXT_PUBLIC_STRAPI_URL || 'http://localhost:1337',
     prefix: '/api',
-    version: 'v4',
+    admin: '/admin',
+    version: 'v5',
     cookie: {},
     cookieName: 'strapi_jwt',
   },
