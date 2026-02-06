@@ -33,7 +33,7 @@
 
           <div style="margin-top:14px; display:flex; gap:12px; flex-wrap:wrap">
             <a class="btn" href="#events">Programm ansehen</a>
-            <a class="btn ghost" href="https://maps.app.goo.gl/" target="_blank" rel="noopener">Anfahrt</a>
+            <a class="btn ghost" :href="mapsUrl" target="_blank" rel="noopener">Anfahrt</a>
           </div>
         </article>
 
@@ -153,6 +153,30 @@ const todayOpeningInfo = computed(() => {
   const hh = String(d.getHours()).padStart(2, "0")
   const mm = String(d.getMinutes()).padStart(2, "0")
   return `Heute geöffnet ab ${hh}:${mm}`
+})
+
+// Dynamische Maps URL basierend auf Device und OS
+const mapsUrl = computed(() => {
+  // Server-side: Google Maps als Fallback
+  if (typeof navigator === 'undefined') {
+    return 'https://maps.app.goo.gl/H2w1sCkS5DC5bTx37?g_st=ic'
+  }
+
+  const userAgent = navigator.userAgent || ''
+
+  // iOS Detection (iPhone, iPad, iPod)
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream
+
+  // macOS Detection
+  const isMacOS = /Macintosh|MacIntel|MacPPC|Mac68K/.test(userAgent)
+
+  // Wenn iOS oder macOS: Apple Maps
+  if (isIOS || isMacOS) {
+    return 'https://maps.apple.com/place?q=StuK+Leipzig&ll=51.3396,12.3731&address=Kochstra%C3%9Fe+132,+04277+Leipzig'
+  }
+
+  // Alle anderen: Google Maps
+  return 'https://maps.app.goo.gl/H2w1sCkS5DC5bTx37?g_st=ic'
 })
 
 // Helper functions for formatting (used by specialEvents)
