@@ -4,12 +4,16 @@
     :data-variant="variant"
     @click="handleClick"
   >
-    <div class="date-badge">
+    <div class="date-badge date-badge-desktop">
       <b>{{ formattedDate }}</b>
       <small class="time-mobile">{{ formattedTime }}</small>
     </div>
 
     <div class="body">
+      <div class="date-info-mobile">
+        <span class="date-mobile">{{ formattedDate }}</span>
+        <span class="time-mobile-inline">{{ formattedTime }}</span>
+      </div>
       <h3>{{ event.title }}</h3>
       <p class="sub description-desktop" style="margin:0">
         {{ event.description || "Mehr Infos folgen bald!" }}
@@ -90,6 +94,11 @@ function handleClick() {
   font-weight: 500;
 }
 
+/* Date Info Mobile (nur auf Mobile sichtbar) */
+.date-info-mobile {
+  display: none;
+}
+
 /* Mobile Optimierungen */
 @media (max-width: 640px) {
   /* Description auf Mobile verstecken */
@@ -97,41 +106,52 @@ function handleClick() {
     display: none !important;
   }
 
-  /* Date Badge kompakter */
-  .date-badge {
+  /* Desktop Date Badge ausblenden */
+  .date-badge-desktop {
+    display: none !important;
+  }
+
+  /* Mobile Date Info einblenden */
+  .date-info-mobile {
+    display: flex;
     flex-direction: column;
     gap: 2px;
-    padding: 4px 8px;
-    align-items: flex-start;
+    margin-bottom: 4px;
   }
 
-  .date-badge b {
-    font-size: 0.75rem;
+  .date-mobile {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--brand-red);
+    letter-spacing: 0.3px;
   }
 
-  .time-mobile {
+  .time-mobile-inline {
     font-size: 0.65rem;
+    color: #a7abb2;
+    font-weight: 500;
   }
 
-  /* Card-Body kompakter */
-  .card .body {
-    padding: 8px;
-  }
-
-  .card .body h3 {
-    font-size: 0.85rem;
-    line-height: 1.2;
-    margin: 0;
-  }
-
-  /* Card klickbar auf Mobile */
+  /* Card selbst kompakter und klickbar */
   .card {
+    padding: 2px;
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
 
   .card:active {
     transform: scale(0.98);
+  }
+
+  /* Card-Body kompakter */
+  .card .body {
+    padding: 0px 6px 8px 6px;
+  }
+
+  .card .body h3 {
+    font-size: 0.85rem;
+    line-height: 1.2;
+    margin: 0;
   }
 }
 </style>
