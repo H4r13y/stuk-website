@@ -184,6 +184,12 @@ useHead({
   padding: 70px 0 56px
 }
 
+@media (max-width: 640px) {
+  .hero {
+    padding: 32px 0 0px;
+  }
+}
+
 .hero-grid {
   display: grid;
   gap: 24px;

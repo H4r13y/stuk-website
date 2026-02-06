@@ -220,6 +220,12 @@ function resetFilters() {
   transition: padding .18s ease;
 }
 
+@media (max-width: 640px) {
+  .controls {
+    top: 8px;
+  }
+}
+
 @media (min-width: 641px) {
   .controls {
     -webkit-backdrop-filter: blur(16px) saturate(1.3);
@@ -233,7 +239,7 @@ function resetFilters() {
   align-items: center;
   gap: 8px;
   padding: 12px 18px;
-  background: var(--brand-red);
+  background: #8a2420;
   color: white;
   border: none;
   border-radius: var(--radius);
@@ -244,7 +250,7 @@ function resetFilters() {
 }
 
 .filter-toggle-mobile:hover {
-  background: #a02f2a;
+  background: #6e1d1a;
   transform: translateY(-1px);
 }
 
