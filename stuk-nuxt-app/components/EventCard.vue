@@ -149,9 +149,12 @@ function handleClick() {
   }
 
   .card .body h3 {
-    font-size: 0.85rem;
+    font-size: clamp(0.7rem, 2.5vw, 0.85rem);
     line-height: 1.2;
     margin: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
 }
 </style>
