@@ -1,0 +1,24 @@
+{
+  "kind": "singleType",
+  "collectionName": "hero_sliders",
+  "info": {
+    "singularName": "hero-slider",
+    "pluralName": "hero-sliders",
+    "displayName": "Hero-slider"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "bilder": {
+      "type": "media",
+      "multiple": true,
+      "required": true,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    }
+  }
+}

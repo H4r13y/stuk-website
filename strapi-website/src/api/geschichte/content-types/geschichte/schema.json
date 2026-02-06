@@ -1,0 +1,21 @@
+{
+  "kind": "singleType",
+  "collectionName": "geschichtes",
+  "info": {
+    "singularName": "geschichte",
+    "pluralName": "geschichtes",
+    "displayName": "Geschichte"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Geschichteneintrag": {
+      "type": "component",
+      "component": "geschichte.geschichte",
+      "repeatable": true,
+      "required": true
+    }
+  }
+}

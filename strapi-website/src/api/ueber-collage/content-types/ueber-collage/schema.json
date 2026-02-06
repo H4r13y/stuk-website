@@ -1,0 +1,21 @@
+{
+  "kind": "singleType",
+  "collectionName": "ueber_collages",
+  "info": {
+    "singularName": "ueber-collage",
+    "pluralName": "ueber-collages",
+    "displayName": "über-collage"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Bildeintrag": {
+      "type": "component",
+      "component": "uebercollage.ueber-collage",
+      "repeatable": true,
+      "required": true
+    }
+  }
+}

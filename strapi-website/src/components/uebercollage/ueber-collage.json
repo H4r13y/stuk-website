@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_uebercollage_ueber_collages",
+  "info": {
+    "displayName": "über-collage"
+  },
+  "options": {},
+  "attributes": {
+    "Bildbeschreibung": {
+      "type": "text"
+    },
+    "Bild": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    }
+  },
+  "config": {}
+}

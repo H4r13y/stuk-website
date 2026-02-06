@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_geschichte_geschichtes",
+  "info": {
+    "displayName": "Geschichte"
+  },
+  "options": {},
+  "attributes": {
+    "Kurztext": {
+      "type": "string",
+      "required": true
+    },
+    "Jahreszahl": {
+      "type": "biginteger",
+      "required": true
+    },
+    "Beschreibung": {
+      "type": "text"
+    },
+    "Bild": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    }
+  },
+  "config": {}
+}

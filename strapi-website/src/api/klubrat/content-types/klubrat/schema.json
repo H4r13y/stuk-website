@@ -1,0 +1,59 @@
+{
+  "kind": "collectionType",
+  "collectionName": "klubrats",
+  "info": {
+    "singularName": "klubrat",
+    "pluralName": "klubrats",
+    "displayName": "Klubrat"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Name": {
+      "type": "string",
+      "required": true
+    },
+    "Posten": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "Buchhaltung",
+        "Dienstmanager",
+        "EDV / Technik",
+        "Einlass",
+        "Formalia",
+        "Gastro",
+        "Hausmeister",
+        "Kasse",
+        "Lager / Einkauf",
+        "Mitgliederwerbung",
+        "Öffentlichkeitsarbeit",
+        "RuTiLuSt",
+        "Vereinsleben",
+        "Vermietung"
+      ]
+    },
+    "Kurzbeschreibung": {
+      "type": "text",
+      "required": true
+    },
+    "Profilbild": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "KR_Merkmale": {
+      "type": "component",
+      "component": "klubrat.kr-merkmale",
+      "repeatable": true
+    }
+  }
+}
