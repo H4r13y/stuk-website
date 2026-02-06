@@ -101,6 +101,7 @@
           :key="event.id"
           :event="event"
           :variant="index % 4"
+          @click="handleEventClick"
         />
 
         <p
@@ -111,6 +112,43 @@
         </p>
       </template>
     </div>
+
+    <!-- Event Details Modal (nur Mobile) -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="selectedEvent" class="event-modal-overlay" @click="selectedEvent = null">
+          <div class="event-modal" @click.stop>
+            <div class="event-modal-header">
+              <div class="event-modal-date">
+                <b>{{ formatEventDate(selectedEvent) }}</b>
+                <small>{{ formatEventTime(selectedEvent) }}</small>
+              </div>
+              <button class="close-btn" @click="selectedEvent = null">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div class="event-modal-content">
+              <h2>{{ selectedEvent.title }}</h2>
+              <p v-if="selectedEvent.description" class="event-description">
+                {{ selectedEvent.description }}
+              </p>
+              <p v-else class="event-description muted">
+                Mehr Infos folgen bald!
+              </p>
+
+              <div v-if="selectedEvent.labels && selectedEvent.labels.length > 0" class="event-labels">
+                <span v-for="label in selectedEvent.labels" :key="label.id" class="event-label">
+                  {{ label.name }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </section>
 </template>
 
@@ -135,6 +173,7 @@ const strapiUrl = config.public.strapiUrl
 // State
 const activeFilters = ref<string[]>([])
 const showFilterModal = ref(false)
+const selectedEvent = ref<Event | null>(null)
 
 // Fetch: Labels (lazy load on client)
 const {
@@ -199,6 +238,26 @@ function toggleFilter(tag: string) {
 
 function resetFilters() {
   activeFilters.value = []
+}
+
+function handleEventClick(event: Event) {
+  selectedEvent.value = event
+}
+
+function formatEventDate(event: Event) {
+  const date = new Date(event.start)
+  const weekdays = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
+  const weekday = weekdays[date.getDay()]
+  const day = date.getDate()
+  const month = date.getMonth() + 1
+  return `${weekday} ${day}.${month}.`
+}
+
+function formatEventTime(event: Event) {
+  const date = new Date(event.start)
+  const hh = String(date.getHours()).padStart(2, "0")
+  const mm = String(date.getMinutes()).padStart(2, "0")
+  return `ab ${hh}:${mm} Uhr`
 }
 </script>
 
@@ -515,8 +574,127 @@ function resetFilters() {
 
 @media (max-width: 640px) {
   .events {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px
   }
+}
+
+/* Event Details Modal (nur Mobile) */
+.event-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 10000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+@media (min-width: 641px) {
+  .event-modal-overlay {
+    display: none;
+  }
+}
+
+.event-modal {
+  background: linear-gradient(135deg, #0f1013 0%, #1a1d24 100%);
+  border: 1px solid #ffffff22;
+  border-radius: var(--radius) var(--radius) 0 0;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.6);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.event-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+  border-bottom: 1px solid #ffffff12;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.event-modal-date {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  background: rgba(188, 43, 37, 0.15);
+  border: 1px solid rgba(188, 43, 37, 0.3);
+  border-radius: 8px;
+}
+
+.event-modal-date b {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--brand-red);
+  letter-spacing: 0.3px;
+}
+
+.event-modal-date small {
+  font-size: 0.8rem;
+  color: #a7abb2;
+  font-weight: 500;
+}
+
+.event-modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 20px;
+}
+
+.event-modal-content h2 {
+  margin: 0 0 16px;
+  color: var(--text);
+  font-size: 1.5rem;
+  line-height: 1.3;
+}
+
+.event-description {
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0 0 20px;
+  font-size: 0.95rem;
+}
+
+.event-description.muted {
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.event-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.event-label {
+  display: inline-block;
+  padding: 6px 12px;
+  background: rgba(33, 48, 77, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 </style>

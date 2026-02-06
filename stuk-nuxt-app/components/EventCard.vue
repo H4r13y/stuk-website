@@ -1,5 +1,9 @@
 <template>
-  <article class="card" :data-variant="variant">
+  <article
+    class="card"
+    :data-variant="variant"
+    @click="handleClick"
+  >
     <div class="date-badge">
       <b>{{ formattedDate }}</b>
       <small class="time-mobile">{{ formattedTime }}</small>
@@ -32,6 +36,10 @@ const props = defineProps<{
   variant?: number
 }>()
 
+const emit = defineEmits<{
+  click: [event: Event]
+}>()
+
 const formattedDate = computed(() => {
   const date = new Date(props.event.start)
   const weekdays = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
@@ -47,6 +55,13 @@ const formattedTime = computed(() => {
   const mm = String(date.getMinutes()).padStart(2, "0")
   return `ab ${hh}:${mm} Uhr`
 })
+
+function handleClick() {
+  // Nur auf Mobile das Popup öffnen
+  if (window.innerWidth <= 640) {
+    emit('click', props.event)
+  }
+}
 </script>
 
 <style>
@@ -86,27 +101,37 @@ const formattedTime = computed(() => {
   .date-badge {
     flex-direction: column;
     gap: 2px;
-    padding: 6px 10px;
+    padding: 4px 8px;
     align-items: flex-start;
   }
 
   .date-badge b {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
   }
 
   .time-mobile {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
   }
 
   /* Card-Body kompakter */
   .card .body {
-    padding: 10px;
+    padding: 8px;
   }
 
   .card .body h3 {
-    font-size: 0.95rem;
-    line-height: 1.3;
+    font-size: 0.85rem;
+    line-height: 1.2;
     margin: 0;
+  }
+
+  /* Card klickbar auf Mobile */
+  .card {
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .card:active {
+    transform: scale(0.98);
   }
 }
 </style>
