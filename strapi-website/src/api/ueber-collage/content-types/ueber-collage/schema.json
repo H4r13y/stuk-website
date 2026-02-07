@@ -11,11 +11,14 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "Bildeintrag": {
-      "type": "component",
-      "component": "uebercollage.ueber-collage",
-      "repeatable": true,
-      "required": true
+    "Bilder": {
+      "type": "media",
+      "multiple": true,
+      "required": true,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
     }
   }
 }

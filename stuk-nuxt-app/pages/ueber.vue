@@ -41,19 +41,18 @@
         </div>
       </div>
 
-      <div class="member-collage">
-        <div class="collage-item tall" style="background-image:url('/bilder/WhatsApp Image 2025-10-16 at 11.28.54.jpeg')" @click="openGallery(0)"></div>
-        <div class="collage-item" style="background-image:url('/bilder/WhatsApp Image 2025-10-16 at 11.28.54 (1).jpeg')" @click="openGallery(1)"></div>
-        <div class="collage-item" style="background-image:url('/bilder/WhatsApp Image 2025-10-16 at 11.28.58.jpeg')" @click="openGallery(2)"></div>
-        <div class="collage-item wide" style="background-image:url('/bilder/WhatsApp Image 2025-10-16 at 11.28.58 (1).jpeg')" @click="openGallery(3)"></div>
-        <div class="collage-item" style="background-image:url('/bilder/WhatsApp Image 2025-10-16 at 11.28.58 (2).jpeg')" @click="openGallery(4)"></div>
-        <div class="collage-item tall" style="background-image:url('/bilder/WhatsApp Image 2025-10-16 at 11.28.59.jpeg')" @click="openGallery(5)"></div>
-        <div class="collage-item" style="background-image:url('/bilder/WhatsApp Image 2025-10-16 at 11.28.59 (1).jpeg')" @click="openGallery(6)"></div>
-        <div class="collage-item" style="background-image:url('/bilder/WhatsApp Image 2025-10-16 at 11.28.59 (2).jpeg')" @click="openGallery(7)"></div>
-        <div class="collage-item wide" style="background-image:url('/bilder/WhatsApp Image 2025-10-16 at 11.29.03.jpeg')" @click="openGallery(8)"></div>
-        <div class="collage-item" style="background-image:url('/bilder/WhatsApp Image 2025-10-16 at 11.29.04.jpeg')" @click="openGallery(9)"></div>
-        <div class="collage-item" style="background-image:url('/bilder/WhatsApp Image 2025-10-16 at 11.29.04 (1).jpeg')" @click="openGallery(10)"></div>
-        <div class="collage-item tall" style="background-image:url('/bilder/WhatsApp Image 2025-10-16 at 11.29.04 (2).jpeg')" @click="openGallery(11)"></div>
+      <div v-if="collagePending" class="loading">Lade Galerie...</div>
+      <div v-else-if="collageError" class="error">Fehler beim Laden der Galerie</div>
+      <div v-else class="member-collage">
+        <div
+          v-for="(image, index) in galleryImages"
+          :key="index"
+          class="collage-item"
+          :class="getCollageItemClass(index)"
+          :style="{ backgroundImage: `url('${image.src}')` }"
+          :title="image.caption"
+          @click="openGallery(index)"
+        ></div>
       </div>
     </section>
 
@@ -116,8 +115,12 @@
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </button>
     <div class="gallery-lightbox-content">
-      <img class="gallery-lightbox-image" :src="galleryImages[currentGalleryIndex].src" :alt="galleryImages[currentGalleryIndex].caption">
-      <div class="gallery-lightbox-caption">
+      <img
+        class="gallery-lightbox-image"
+        :src="galleryImages[currentGalleryIndex]?.src"
+        :alt="galleryImages[currentGalleryIndex]?.alt"
+      >
+      <div v-if="galleryImages[currentGalleryIndex]?.caption" class="gallery-lightbox-caption">
         <p>{{ galleryImages[currentGalleryIndex].caption }}</p>
       </div>
     </div>
@@ -131,6 +134,8 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 type StrapiMedia = {
   id: number
   url: string
+  alternativeText?: string
+  caption?: string
   formats?: {
     thumbnail?: { url: string }
     small?: { url: string }
@@ -154,7 +159,13 @@ type Klubrat = {
   KR_Merkmale: KRMerkmal[]
 }
 
+type UeberCollage = {
+  id: number
+  Bilder: StrapiMedia[]
+}
+
 type StrapiList<T> = { data: T[] }
+type StrapiSingle<T> = { data: T }
 
 // SEO
 useHead({
@@ -179,6 +190,15 @@ const {
 
 const klubrats = computed(() => klubratsRes.value?.data || [])
 const klubratCount = computed(() => klubrats.value.length)
+
+// Fetch Über-Collage data
+const {
+  data: collageRes,
+  pending: collagePending,
+  error: collageError,
+} = await useFetch<StrapiSingle<UeberCollage>>(`${strapiUrl}/api/ueber-collage?populate=*`, {
+  server: true,
+})
 
 // Modal state
 const selectedMember = ref<Klubrat | null>(null)
@@ -321,57 +341,26 @@ function changeTimelineBackground(newImage: string) {
   currentBgImage = newImage
 }
 
-// Gallery
-const galleryImages = [
-  {
-    src: '/bilder/WhatsApp Image 2025-10-16 at 11.28.54.jpeg',
-    caption: 'Dienstagsparty im StuK – die Bühne glüht, die Stimmung ist elektrisierend. Ein Abend voller Musik, Tanz und unvergesslicher Momente.'
-  },
-  {
-    src: '/bilder/WhatsApp Image 2025-10-16 at 11.28.54 (1).jpeg',
-    caption: 'Quizlabor-Finale – die Teams kämpfen um jeden Punkt. Wissen, Spaß und Bierpreise in studentischer Atmosphäre.'
-  },
-  {
-    src: '/bilder/WhatsApp Image 2025-10-16 at 11.28.58.jpeg',
-    caption: 'Live-Konzert einer lokalen Band – authentisch, laut, nah dran. Der StuK als Sprungbrett für Leipziger Nachwuchskünstler.'
-  },
-  {
-    src: '/bilder/WhatsApp Image 2025-10-16 at 11.28.58 (1).jpeg',
-    caption: 'Hinter den Kulissen beim Aufbau – Technik-Team in Aktion. Ohne diese Leute läuft hier nichts, aber mit ihnen läuft alles perfekt.'
-  },
-  {
-    src: '/bilder/WhatsApp Image 2025-10-16 at 11.28.58 (2).jpeg',
-    caption: 'E-Sports-Turnier im StuK – Zocker-Vibes und Gaming-Community. Controller in der Hand, Energie im Raum, Spaß garantiert.'
-  },
-  {
-    src: '/bilder/WhatsApp Image 2025-10-16 at 11.28.59.jpeg',
-    caption: 'Soundcheck vor der Themenparty – das Bar-Team bereitet sich vor. Drinks mixen, Playlist checken, ready for action.'
-  },
-  {
-    src: '/bilder/WhatsApp Image 2025-10-16 at 11.28.59 (1).jpeg',
-    caption: 'Kleinkunst-Abend mit Poetry Slam – Worte, die berühren. Studentische Künstler teilen ihre Geschichten, authentisch und ehrlich.'
-  },
-  {
-    src: '/bilder/WhatsApp Image 2025-10-16 at 11.28.59 (2).jpeg',
-    caption: 'Awareness-Team im Einsatz – weil sich jeder sicher fühlen soll. Null Toleranz für Diskriminierung, hundert Prozent Support für alle.'
-  },
-  {
-    src: '/bilder/WhatsApp Image 2025-10-16 at 11.29.03.jpeg',
-    caption: 'Vollversammlung der Mitglieder – Demokratie wird hier gelebt. Gemeinsam entscheiden, gemeinsam gestalten, gemeinsam feiern.'
-  },
-  {
-    src: '/bilder/WhatsApp Image 2025-10-16 at 11.29.04.jpeg',
-    caption: 'DJ-Set am Wochenende – Beats, die durch Mark und Bein gehen. Die Tanzfläche ist voll, die Nacht ist jung, der StuK ist alive.'
-  },
-  {
-    src: '/bilder/WhatsApp Image 2025-10-16 at 11.29.04 (1).jpeg',
-    caption: 'Arbeitseinsatz im Club – renovieren, streichen, anpacken. Ehrenamtlich, mit Herz und manchmal auch mit Farbklecksen im Gesicht.'
-  },
-  {
-    src: '/bilder/WhatsApp Image 2025-10-16 at 11.29.04 (2).jpeg',
-    caption: 'Nach der Party – müde, glücklich, zusammen. Die besten Gespräche entstehen nach 3 Uhr morgens bei einem letzten Bier.'
+// Gallery - computed from Strapi data
+const galleryImages = computed(() => {
+  const images = collageRes.value?.data?.Bilder || []
+  return images.map((img: StrapiMedia) => ({
+    src: `${strapiUrl}${img.url}`,
+    alt: img.alternativeText || 'StuK Galeriebild',
+    caption: img.caption || ''
+  }))
+})
+
+// Define which images should be tall or wide (matching original layout)
+const tallIndices = [0, 5, 11]
+const wideIndices = [3, 8]
+
+function getCollageItemClass(index: number) {
+  return {
+    tall: tallIndices.includes(index),
+    wide: wideIndices.includes(index)
   }
-]
+}
 
 const galleryActive = ref(false)
 const currentGalleryIndex = ref(0)
@@ -389,8 +378,8 @@ function navigateGallery(direction: number) {
   currentGalleryIndex.value += direction
 
   if (currentGalleryIndex.value < 0) {
-    currentGalleryIndex.value = galleryImages.length - 1
-  } else if (currentGalleryIndex.value >= galleryImages.length) {
+    currentGalleryIndex.value = galleryImages.value.length - 1
+  } else if (currentGalleryIndex.value >= galleryImages.value.length) {
     currentGalleryIndex.value = 0
   }
 }
