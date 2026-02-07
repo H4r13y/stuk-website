@@ -39,6 +39,9 @@
       "type": "text",
       "required": true
     },
+    "EMail": {
+      "type": "email"
+    },
     "Profilbild": {
       "type": "media",
       "multiple": false,

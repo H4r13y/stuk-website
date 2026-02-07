@@ -1,0 +1,19 @@
+{
+  "kind": "singleType",
+  "collectionName": "ueber_unss",
+  "info": {
+    "singularName": "ueber-uns",
+    "pluralName": "ueber-unss",
+    "displayName": "Über uns"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Inhalt": {
+      "type": "richtext",
+      "required": true
+    }
+  }
+}

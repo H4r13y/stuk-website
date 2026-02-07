@@ -157,7 +157,7 @@ import { computed, ref } from "vue"
 
 type StrapiList<T> = { data: T[] }
 
-type Label = { id: number; name: string }
+type Label = { id: number; name: string; description?: string | null }
 type Event = {
   id: number
   title: string

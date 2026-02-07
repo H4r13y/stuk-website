@@ -4,9 +4,13 @@
       <h1>Über den StuK</h1>
       <p class="sub">Studentischer Klub seit den 90ern – Kultur, Bar & Gemeinschaft.</p>
 
-      <p style="margin-top:24px; color:var(--text); line-height:1.7">
-        Der StuK Leipzig ist mehr als nur ein Club – er ist ein selbstverwalteter Freiraum von Studierenden für Studierende. Seit 1997 am Bayerischen Bahnhof beheimatet, leben wir Basisdemokratie, Ehrenamt und Gemeinschaft. Hier gibt es keine kommerziellen Interessen, keine Türsteher mit Attitüde, sondern günstige Getränke, vielfältige Events und Menschen, die gemeinsam anpacken. Ob an der Bar, hinter der Technik, beim Awareness-Team oder im Clubrat – jede:r kann mitmachen, mitgestalten und Teil von etwas Besonderem werden. Denn der StuK gehört nicht einer Firma, sondern uns allen.
-      </p>
+      <div v-if="ueberUnsHtml" class="markdown-content" v-html="ueberUnsHtml"></div>
+      <!-- <p v-else style="margin-top:24px; color:var(--text); line-height:1.7">
+        Der StuK Leipzig ist mehr als nur ein Club – er ist ein selbstverwalteter Freiraum von Studierenden für Studierende. Seit 1997 am Bayerischen Bahnhof beheimatet,
+        leben wir Basisdemokratie, Ehrenamt und Gemeinschaft. Hier gibt es keine kommerziellen Interessen, keine Türsteher mit Attitüde, sondern günstige Getränke,
+        vielfältige Events und Menschen, die gemeinsam anpacken. Ob an der Bar, hinter der Technik, beim Awareness-Team oder im Clubrat – jede:r kann mitmachen,
+        mitgestalten und Teil von etwas Besonderem werden. Denn der StuK gehört nicht einer Firma, sondern uns allen.
+      </p> -->
     </section>
 
     <section class="container">
@@ -16,12 +20,7 @@
       <div v-if="klubratPending" class="loading">Lade Klubrat...</div>
       <div v-else-if="klubratError" class="error">Fehler beim Laden der Klubratsmitglieder</div>
       <div v-else class="council-grid">
-        <div
-          v-for="member in klubrats"
-          :key="member.id"
-          class="council-card"
-          @click="openModal(member)"
-        >
+        <div v-for="member in klubrats" :key="member.id" class="council-card" @click="openModal(member)">
           <div class="avatar" :style="getAvatarStyle(member)"></div>
           <div class="info">
             <h3>{{ member.Name }}</h3>
@@ -49,14 +48,14 @@
           :key="index"
           class="collage-item"
           :class="getCollageItemClass(index)"
-          :style="{ backgroundImage: `url('${image.src}')` }"
+          :style="{ backgroundImage: `url('${image.previewSrc}')` }"
           :title="image.caption"
           @click="openGallery(index)"
         ></div>
       </div>
     </section>
 
-    <div id="timeline-1" class="timeline-container">
+    <div v-if="timelineEvents.length > 0" id="timeline-1" class="timeline-container">
       <div class="timeline-bg-layer" :class="{ active: activeTimelineBg === 1 }"></div>
       <div class="timeline-bg-layer" :class="{ active: activeTimelineBg === 2 }"></div>
       <div class="timeline-header">
@@ -72,7 +71,7 @@
           :data-text="event.label"
         >
           <div class="timeline__content">
-            <img class="timeline__img" :src="event.image" :alt="event.label">
+            <img class="timeline__img" :src="event.image" :alt="event.label" />
             <h2 class="timeline__content-title">{{ event.year }}</h2>
             <p class="timeline__content-desc">{{ event.description }}</p>
           </div>
@@ -85,11 +84,17 @@
   <div v-if="selectedMember" class="council-modal active" @click.self="closeModal">
     <div class="council-modal-content">
       <button class="close-modal" @click="closeModal">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
       </button>
+
+      <!-- large background image in modal header -->
       <div class="modal-header" :style="getHeaderStyle(selectedMember)"></div>
+
       <div class="modal-body">
-        <img class="modal-avatar-small" :src="getImageUrl(selectedMember.Profilbild)" :alt="selectedMember.Name">
+        <!-- medium in modal -->
+        <img class="modal-avatar-small" :src="getImageUrl(selectedMember.Profilbild, 'medium')" :alt="selectedMember.Name" />
         <h2>{{ selectedMember.Name }}</h2>
         <p class="modal-role">{{ selectedMember.Posten }}</p>
         <p class="bio">{{ selectedMember.Kurzbeschreibung }}</p>
@@ -106,20 +111,31 @@
   <!-- Gallery Lightbox -->
   <div v-if="galleryActive" class="gallery-lightbox active" @click.self="closeGallery">
     <button class="gallery-close-btn" @click="closeGallery">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6L6 18M6 6l12 12" />
+      </svg>
     </button>
+
     <button class="gallery-nav-btn prev" @click="navigateGallery(-1)">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6" />
+      </svg>
     </button>
+
     <button class="gallery-nav-btn next" @click="navigateGallery(1)">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18l6-6-6-6" />
+      </svg>
     </button>
+
     <div class="gallery-lightbox-content">
       <img
         class="gallery-lightbox-image"
-        :src="galleryImages[currentGalleryIndex]?.src"
+        :src="galleryImages[currentGalleryIndex]?.fullSrc"
         :alt="galleryImages[currentGalleryIndex]?.alt"
-      >
+        loading="eager"
+        decoding="async"
+      />
       <div v-if="galleryImages[currentGalleryIndex]?.caption" class="gallery-lightbox-caption">
         <p>{{ galleryImages[currentGalleryIndex].caption }}</p>
       </div>
@@ -128,7 +144,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 
 // Types
 type StrapiMedia = {
@@ -140,6 +156,7 @@ type StrapiMedia = {
     thumbnail?: { url: string }
     small?: { url: string }
     medium?: { url: string }
+    large?: { url: string }
   }
 }
 
@@ -170,134 +187,144 @@ type StrapiSingle<T> = { data: T }
 // SEO
 useHead({
   title: 'StuK – Über uns',
-  meta: [
-    { name: 'description', content: 'Erfahre mehr über den StuK Leipzig - selbstverwaltet, studentisch und mit Herz seit 1997' }
-  ]
+  meta: [{ name: 'description', content: 'Erfahre mehr über den StuK Leipzig - selbstverwaltet, studentisch und mit Herz seit 1997' }],
 })
 
-// Fetch Klubrat data
+// Fetch data
 const config = useRuntimeConfig()
 const strapiUrl = config.public.strapiUrl
 
-const {
-  data: klubratsRes,
-  pending: klubratPending,
-  error: klubratError,
-} = await useFetch<StrapiList<Klubrat>>(`${strapiUrl}/api/klubrats?populate=*`, {
-  lazy: true,
-  server: false,
-})
+// Klubrat
+const { data: klubratsRes, pending: klubratPending, error: klubratError } = await useFetch<StrapiList<Klubrat>>(
+  `${strapiUrl}/api/klubrats?populate=*`,
+  {
+    lazy: true,
+    server: false,
+  }
+)
 
 const klubrats = computed(() => klubratsRes.value?.data || [])
 const klubratCount = computed(() => klubrats.value.length)
 
-// Fetch Über-Collage data
-const {
-  data: collageRes,
-  pending: collagePending,
-  error: collageError,
-} = await useFetch<StrapiSingle<UeberCollage>>(`${strapiUrl}/api/ueber-collage?populate=*`, {
-  server: true,
-})
+// Über-Collage
+const { data: collageRes, pending: collagePending, error: collageError } = await useFetch<StrapiSingle<UeberCollage>>(
+  `${strapiUrl}/api/ueber-collage?populate=*`,
+  {
+    server: true,
+  }
+)
+
+// Über uns Text
+type UeberUnsData = {
+  id: number
+  Inhalt: string
+}
+
+const { data: ueberUnsRes, pending: ueberUnsPending, error: ueberUnsError } = await useFetch<StrapiSingle<UeberUnsData>>(
+  `${strapiUrl}/api/ueber-uns`,
+  {
+    lazy: true,
+    server: false,
+  }
+)
+
+// Geschichte / Timeline
+type GeschichteEintrag = {
+  id: number
+  Kurztext: string
+  Jahreszahl: string
+  Beschreibung?: string | null
+  Bild?: StrapiMedia | null
+}
+
+type GeschichteData = {
+  id: number
+  Geschichteneintrag: GeschichteEintrag[]
+}
+
+const { data: geschichteRes } = await useFetch<StrapiSingle<GeschichteData>>(
+  `${strapiUrl}/api/geschichte`,
+  {
+    query: {
+      'populate[Geschichteneintrag][populate]': 'Bild',
+    },
+    server: true,
+  }
+)
 
 // Modal state
 const selectedMember = ref<Klubrat | null>(null)
-
 function openModal(member: Klubrat) {
   selectedMember.value = member
 }
-
 function closeModal() {
   selectedMember.value = null
 }
 
-// Get image URL from Strapi media
-function getImageUrl(media: StrapiMedia | null): string {
-  if (!media) return '/bilder/WhatsApp Image 2025-10-16 at 11.28.54.jpeg' // Fallback
-  return `${strapiUrl}${media.url}`
+// Responsive image helper
+type MediaSize = 'thumbnail' | 'small' | 'medium' | 'large' | 'original'
+
+function getImageUrl(media: StrapiMedia | null, size: MediaSize = 'original'): string {
+  const fallback = '/bilder/WhatsApp Image 2025-10-16 at 11.28.54.jpeg'
+  if (!media) return fallback
+
+  if (size === 'original') {
+    return `${strapiUrl}${media.url}`
+  }
+
+  const url = media.formats?.[size]?.url || media.url
+  return `${strapiUrl}${url}`
 }
 
 function getAvatarStyle(member: Klubrat) {
-  const imageUrl = getImageUrl(member.Profilbild)
+  // grid: small
+  const imageUrl = getImageUrl(member.Profilbild, 'small')
   return {
     backgroundImage: `url('${imageUrl}')`,
     backgroundSize: 'cover',
-    backgroundPosition: 'center'
+    backgroundPosition: 'center',
   }
 }
 
 function getHeaderStyle(member: Klubrat) {
-  const imageUrl = getImageUrl(member.Profilbild)
+  // modal header: large
+  const imageUrl = getImageUrl(member.Profilbild, 'large')
   return {
     backgroundImage: `url('${imageUrl}')`,
     backgroundSize: 'cover',
-    backgroundPosition: 'center'
+    backgroundPosition: 'center',
   }
 }
 
-// Timeline data
-const timelineEvents = [
-  {
-    year: '1997',
-    label: 'GRÜNDUNG',
-    image: '/bilder/WhatsApp Image 2025-10-16 at 11.28.54.jpeg',
-    description: 'Der StuK wird gegründet! Im Erdgeschoss des Studentenwohnheims Nürnberger Straße/Brüderstraße am Bayerischen Bahnhof entsteht ein Ort, an dem Studierende selbstorganisiert feiern und Kultur erleben können.'
-  },
-  {
-    year: '1998',
-    label: 'ERSTE EVENTS',
-    image: '/bilder/WhatsApp Image 2025-10-16 at 11.28.54 (1).jpeg',
-    description: 'Die ersten regelmäßigen Veranstaltungen etablieren sich. Die legendäre Dienstagsparty wird zum festen Bestandteil des Leipziger Nachtlebens und zieht Studierende aus allen Fakultäten an.'
-  },
-  {
-    year: '2001',
-    label: 'VEREINSGRÜNDUNG',
-    image: '/bilder/WhatsApp Image 2025-10-16 at 11.28.58.jpeg',
-    description: 'Offizielle Eintragung als eingetragener Verein (Amtsgericht Leipzig, Registernummer 2952). Diese rechtliche Struktur ermöglicht professionellere Organisation bei gleichzeitiger Unabhängigkeit.'
-  },
-  {
-    year: '2005',
-    label: 'RENOVIERUNG',
-    image: '/bilder/WhatsApp Image 2025-10-16 at 11.28.58 (1).jpeg',
-    description: 'Große Renovierungsarbeiten durch unsere Mitglieder. Der Saal wird umgestaltet, neue Technik installiert. Alles in ehrenamtlicher Arbeit – so wie es bis heute üblich ist.'
-  },
-  {
-    year: '2008',
-    label: 'BÜHNENAUSBAU',
-    image: '/bilder/WhatsApp Image 2025-10-16 at 11.28.58 (2).jpeg',
-    description: 'Ausbau der Bühne und Verbesserung der Sound- und Lichttechnik. Live-Konzerte und Kleinkunst-Events werden zu einem wichtigen Programmpunkt. Der StuK etabliert sich als Kulturort.'
-  },
-  {
-    year: '2012',
-    label: 'VIELFALT',
-    image: '/bilder/WhatsApp Image 2025-10-16 at 11.28.59.jpeg',
-    description: 'Das Programm wird vielfältiger: Quizlabor, Spieleabende und E-Sports-Events kommen hinzu. Der StuK ist mehr als nur Party – er wird zum sozialen Treffpunkt mit breitem Kulturangebot.'
-  },
-  {
-    year: '2015',
-    label: 'DIGITALISIERUNG',
-    image: '/bilder/WhatsApp Image 2025-10-16 at 11.28.59 (1).jpeg',
-    description: 'Social Media und moderne Kommunikation: Der StuK geht online. Instagram, Facebook und eine neue Website machen es einfacher, über Events informiert zu bleiben und Teil der Community zu werden.'
-  },
-  {
-    year: '2020',
-    label: 'AWARENESS',
-    image: '/bilder/WhatsApp Image 2025-10-16 at 11.28.59 (2).jpeg',
-    description: 'Einführung des Awareness-Konzepts. Der StuK positioniert sich klar: Null Toleranz für Diskriminierung, Sexismus und Hass. Ein geschultes Team sorgt dafür, dass sich alle sicher fühlen können.'
-  },
-  {
-    year: '2021',
-    label: 'PANDEMIE',
-    image: '/bilder/WhatsApp Image 2025-10-16 at 11.29.00.jpeg',
-    description: 'Corona stellt den StuK auf die Probe. Kreative Online-Formate und angepasste Konzepte halten die Community zusammen. Nach der Wiedereröffnung ist die Freude groß – der StuK lebt!'
-  },
-  {
-    year: '2025',
-    label: 'HEUTE',
-    image: '/bilder/WhatsApp Image 2025-10-16 at 11.29.03.jpeg',
-    description: 'Heute ist der StuK lebendiger denn je: Über 50 aktive Mitglieder, 15 Klubräte, hunderte Events pro Jahr. Ehrenamtlich, unkommerziell, mit Herz – und mit dir! Werde Teil unserer Geschichte.'
+// Markdown-Rendering für Über-uns Text
+const ueberUnsHtml = ref('')
+
+watch(() => ueberUnsRes.value?.data?.Inhalt, async (content) => {
+  if (content) {
+    const { marked } = await import('marked')
+    ueberUnsHtml.value = marked.parse(content) as string
   }
-]
+}, { immediate: true })
+
+// Timeline data - nur aus Strapi
+const timelineEvents = computed(() => {
+  if (!geschichteRes.value?.data?.Geschichteneintrag) {
+    return []
+  }
+
+  const eintraege = geschichteRes.value.data.Geschichteneintrag
+
+  // Sortiere nach Jahreszahl (aufsteigend)
+  return eintraege
+    .slice()
+    .sort((a: GeschichteEintrag, b: GeschichteEintrag) => parseInt(a.Jahreszahl) - parseInt(b.Jahreszahl))
+    .map((eintrag: GeschichteEintrag) => ({
+      year: eintrag.Jahreszahl,
+      label: eintrag.Kurztext.toUpperCase(),
+      image: eintrag.Bild ? getImageUrl(eintrag.Bild, 'medium') : '/bilder/WhatsApp Image 2025-10-16 at 11.28.54.jpeg',
+      description: eintrag.Beschreibung || eintrag.Kurztext,
+    }))
+})
 
 // Timeline scroll functionality
 const timelineRef = ref<HTMLElement | null>(null)
@@ -313,14 +340,13 @@ function checkTimelineItems() {
 
   items.forEach((item, index) => {
     const rect = item.getBoundingClientRect()
-    const itemMiddle = rect.top + (rect.height / 2)
+    const itemMiddle = rect.top + rect.height / 2
 
     if (itemMiddle > 0 && itemMiddle < window.innerHeight) {
       const distanceFromCenter = Math.abs(itemMiddle - viewportMiddle)
-
       if (distanceFromCenter < rect.height) {
         activeTimelineIndex.value = index
-        changeTimelineBackground(timelineEvents[index].image)
+        changeTimelineBackground(timelineEvents.value[index].image)
       }
     }
   })
@@ -331,43 +357,56 @@ function changeTimelineBackground(newImage: string) {
 
   const bgLayer1 = document.querySelector('#timeline-1 .timeline-bg-layer:nth-child(1)') as HTMLElement
   const bgLayer2 = document.querySelector('#timeline-1 .timeline-bg-layer:nth-child(2)') as HTMLElement
-
   if (!bgLayer1 || !bgLayer2) return
 
   const targetLayer = activeTimelineBg.value === 1 ? bgLayer2 : bgLayer1
-
   targetLayer.style.backgroundImage = `url('${newImage}')`
   activeTimelineBg.value = activeTimelineBg.value === 1 ? 2 : 1
   currentBgImage = newImage
 }
 
-// Gallery - computed from Strapi data
+// Gallery images: preview vs full
 const galleryImages = computed(() => {
   const images = collageRes.value?.data?.Bilder || []
   return images.map((img: StrapiMedia) => ({
-    src: `${strapiUrl}${img.url}`,
+    previewSrc: getImageUrl(img, 'small'),     // -> /uploads/small_...
+    fullSrc: getImageUrl(img, 'original'),     // -> /uploads/DSC_06805....
     alt: img.alternativeText || 'StuK Galeriebild',
-    caption: img.caption || ''
+    caption: img.caption || '',
   }))
 })
 
-// Define which images should be tall or wide (matching original layout)
+// Collage layout rules
 const tallIndices = [0, 5, 11]
 const wideIndices = [3, 8]
-
 function getCollageItemClass(index: number) {
   return {
     tall: tallIndices.includes(index),
-    wide: wideIndices.includes(index)
+    wide: wideIndices.includes(index),
   }
 }
 
+// Lightbox state
 const galleryActive = ref(false)
 const currentGalleryIndex = ref(0)
+
+function prefetchImage(url?: string) {
+  if (!url) return
+  const img = new Image()
+  img.src = url
+}
 
 function openGallery(index: number) {
   currentGalleryIndex.value = index
   galleryActive.value = true
+
+  // optional: prefetch next/prev full-res
+  if (galleryImages.value.length > 1) {
+    const next = (index + 1) % galleryImages.value.length
+    const prev = (index - 1 + galleryImages.value.length) % galleryImages.value.length
+    prefetchImage(galleryImages.value[next]?.fullSrc)
+    prefetchImage(galleryImages.value[prev]?.fullSrc)
+  }
 }
 
 function closeGallery() {
@@ -382,21 +421,25 @@ function navigateGallery(direction: number) {
   } else if (currentGalleryIndex.value >= galleryImages.value.length) {
     currentGalleryIndex.value = 0
   }
+
+  // optional: prefetch next/prev full-res
+  if (galleryImages.value.length > 1) {
+    const idx = currentGalleryIndex.value
+    const next = (idx + 1) % galleryImages.value.length
+    const prev = (idx - 1 + galleryImages.value.length) % galleryImages.value.length
+    prefetchImage(galleryImages.value[next]?.fullSrc)
+    prefetchImage(galleryImages.value[prev]?.fullSrc)
+  }
 }
 
 // Keyboard events
 function handleKeydown(e: KeyboardEvent) {
-  if (selectedMember.value && e.key === 'Escape') {
-    closeModal()
-  }
+  if (selectedMember.value && e.key === 'Escape') closeModal()
+
   if (galleryActive.value) {
-    if (e.key === 'Escape') {
-      closeGallery()
-    } else if (e.key === 'ArrowLeft') {
-      navigateGallery(-1)
-    } else if (e.key === 'ArrowRight') {
-      navigateGallery(1)
-    }
+    if (e.key === 'Escape') closeGallery()
+    else if (e.key === 'ArrowLeft') navigateGallery(-1)
+    else if (e.key === 'ArrowRight') navigateGallery(1)
   }
 }
 
@@ -408,9 +451,9 @@ onMounted(() => {
 
   // Initialize first timeline bg
   const bgLayer1 = document.querySelector('#timeline-1 .timeline-bg-layer:nth-child(1)') as HTMLElement
-  if (bgLayer1 && timelineEvents.length > 0) {
-    bgLayer1.style.backgroundImage = `url('${timelineEvents[0].image}')`
-    currentBgImage = timelineEvents[0].image
+  if (bgLayer1 && timelineEvents.value.length > 0) {
+    bgLayer1.style.backgroundImage = `url('${timelineEvents.value[0].image}')`
+    currentBgImage = timelineEvents.value[0].image
   }
 })
 
@@ -525,8 +568,12 @@ onUnmounted(() => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .council-modal-content {
@@ -873,7 +920,7 @@ onUnmounted(() => {
   width: 2px;
   height: 100%;
   margin-left: -1px;
-  content: "";
+  content: '';
   background: rgba(188, 43, 37, 0.3);
 }
 
@@ -992,7 +1039,7 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   background: rgba(10, 11, 13, 0.85);
-  content: "";
+  content: '';
   z-index: 2;
 }
 
@@ -1101,5 +1148,83 @@ onUnmounted(() => {
   text-align: center;
   padding: 40px;
   color: var(--muted);
+}
+
+/* Markdown Content Styling */
+.markdown-content {
+  margin-top: 24px;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+.markdown-content p {
+  margin: 16px 0;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3 {
+  color: var(--text);
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin: 16px 0;
+  padding-left: 24px;
+}
+
+.markdown-content li {
+  margin: 8px 0;
+}
+
+.markdown-content a {
+  color: var(--brand-red);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(188, 43, 37, 0.3);
+  transition: border-color 0.2s;
+}
+
+.markdown-content a:hover {
+  border-bottom-color: var(--brand-red);
+}
+
+.markdown-content strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.markdown-content em {
+  font-style: italic;
+}
+
+.markdown-content code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.markdown-content pre {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 16px;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  margin: 16px 0;
+}
+
+.markdown-content pre code {
+  background: none;
+  padding: 0;
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid var(--brand-red);
+  padding-left: 16px;
+  margin: 16px 0;
+  color: var(--muted);
+  font-style: italic;
 }
 </style>

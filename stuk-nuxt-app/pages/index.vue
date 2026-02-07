@@ -27,7 +27,8 @@
     <section class="hero">
       <div class="container hero-grid">
         <article class="panel">
-          <h1>{{ currentMonth }} im StuK</h1>
+          <!-- <h1>{{ currentMonth }} im StuK</h1> -->
+           <h2>Kommende Veranstaltungen im StuK</h2>
           <p class="sub">Konzerte, Kleinkunst, Quiz & Clubnächte – schnapp dir deine Woche.</p>
           <div class="badge"><span class="dot"></span> {{ todayOpeningInfo }}</div>
 

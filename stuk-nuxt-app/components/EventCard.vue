@@ -16,7 +16,7 @@
       </div>
       <h3>{{ event.title }}</h3>
       <p class="sub description-desktop" style="margin:0">
-        {{ event.description || "Mehr Infos folgen bald!" }}
+        {{ displayDescription }}
       </p>
     </div>
   </article>
@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import { computed } from "vue"
 
-type Label = { id: number; name: string }
+type Label = { id: number; name: string; description?: string | null }
 type Event = {
   id: number
   title: string
@@ -58,6 +58,28 @@ const formattedTime = computed(() => {
   const hh = String(date.getHours()).padStart(2, "0")
   const mm = String(date.getMinutes()).padStart(2, "0")
   return `ab ${hh}:${mm} Uhr`
+})
+
+// Beschreibung: Label-Description oder Event-Description
+const displayDescription = computed(() => {
+  const labels = props.event.labels || []
+
+  // Prüfe ob "Spezialevent" Label vorhanden ist
+  const hasSpecialEvent = labels.some(label => label.name.toLowerCase() === 'spezialevent')
+
+  // Wenn Spezialevent: Zeige event.description
+  if (hasSpecialEvent) {
+    return props.event.description || "Mehr Infos folgen bald!"
+  }
+
+  // Sonst: Zeige die description vom ersten Label (falls vorhanden)
+  const firstLabelWithDesc = labels.find(label => label.description)
+  if (firstLabelWithDesc?.description) {
+    return firstLabelWithDesc.description
+  }
+
+  // Fallback
+  return "Mehr Infos folgen bald!"
 })
 
 function handleClick() {
