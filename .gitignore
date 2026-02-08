@@ -22,6 +22,8 @@ config.local.*
 # Project Specific
 ############################
 migration_strapi_daten.md
+strapi.dump
+uploads.tgz
 
 # Excluded directories
 StuK-Site/
