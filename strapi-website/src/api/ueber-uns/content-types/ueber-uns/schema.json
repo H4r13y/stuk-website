@@ -4,7 +4,7 @@
   "info": {
     "singularName": "ueber-uns",
     "pluralName": "ueber-unss",
-    "displayName": "Über uns"
+    "displayName": "Über-uns"
   },
   "options": {
     "draftAndPublish": true
@@ -12,8 +12,7 @@
   "pluginOptions": {},
   "attributes": {
     "Inhalt": {
-      "type": "richtext",
-      "required": true
+      "type": "richtext"
     }
   }
 }

@@ -9,8 +9,13 @@ export default defineNuxtConfig({
    * - default: lokal localhost, prod per ENV
    */
   runtimeConfig: {
+    // Private (nur server-side)
+    emailStrapiToken: process.env.EMAIL_STRAPI_TOKEN || '',
+
+    // Public (client + server)
     public: {
       strapiUrl: process.env.NUXT_PUBLIC_STRAPI_URL || 'http://localhost:1337',
+      emailStrapiToken: process.env.EMAIL_STRAPI_TOKEN || '',
     },
   },
 

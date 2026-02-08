@@ -84,7 +84,7 @@
           <div class="input"><label>Name</label><input v-model="forms.general.name" placeholder="Dein Name" required></div>
           <div class="input"><label>E-Mail</label><input v-model="forms.general.email" type="email" placeholder="du@beispiel.de" required></div>
           <div class="input" style="grid-column:1/-1"><label>Nachricht</label><textarea v-model="forms.general.message" placeholder="Worum geht's?" required></textarea></div>
-          <div style="grid-column:1/-1"><button class="btn" type="submit">Senden</button></div>
+          <div style="grid-column:1/-1"><button class="btn" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'Wird gesendet...' : 'Senden' }}</button></div>
         </form>
       </article>
     </section>
@@ -140,7 +140,7 @@
             </small>
           </div>
           <div class="input" style="grid-column:1/-1"><label>Sonderwünsche / Anmerkungen</label><textarea v-model="forms.booking.notes" placeholder="Besondere Anforderungen, Vorband, weitere Infos, etc." rows="5"></textarea></div>
-          <div style="grid-column:1/-1"><button class="btn" type="submit">Anfrage senden</button></div>
+          <div style="grid-column:1/-1"><button class="btn" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'Wird gesendet...' : 'Anfrage senden' }}</button></div>
         </form>
       </article>
     </section>
@@ -155,7 +155,7 @@
           <div class="input"><label>E-Mail</label><input v-model="forms.lost.email" type="email" placeholder="du@beispiel.de" required></div>
           <div class="input" style="grid-column:1/-1"><label>Event / Datum</label><input v-model="forms.lost.event" placeholder="z.B. Quizlabor am 2.10." required></div>
           <div class="input" style="grid-column:1/-1"><label>Was hast du verloren?</label><textarea v-model="forms.lost.description" placeholder="Beschreibe den Gegenstand möglichst genau" required></textarea></div>
-          <div style="grid-column:1/-1"><button class="btn" type="submit">Anfrage senden</button></div>
+          <div style="grid-column:1/-1"><button class="btn" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'Wird gesendet...' : 'Anfrage senden' }}</button></div>
         </form>
       </article>
     </section>
@@ -170,7 +170,7 @@
           <div class="input"><label>E-Mail</label><input v-model="forms.board.email" type="email" placeholder="kontakt@beispiel.de" required></div>
           <div class="input" style="grid-column:1/-1"><label>Betreff</label><input v-model="forms.board.subject" placeholder="Worum geht es?" required></div>
           <div class="input" style="grid-column:1/-1"><label>Nachricht</label><textarea v-model="forms.board.message" placeholder="Dein Anliegen" required></textarea></div>
-          <div style="grid-column:1/-1"><button class="btn" type="submit">An Vorstand senden</button></div>
+          <div style="grid-column:1/-1"><button class="btn" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'Wird gesendet...' : 'An Vorstand senden' }}</button></div>
         </form>
       </article>
     </section>
@@ -196,7 +196,7 @@
               <option>Orga</option>
             </select>
           </div>
-          <div style="grid-column:1/-1"><button class="btn" type="submit">Bewerbung senden</button></div>
+          <div style="grid-column:1/-1"><button class="btn" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'Wird gesendet...' : 'Bewerbung senden' }}</button></div>
         </form>
       </article>
     </section>
@@ -205,7 +205,7 @@
       <button class="btn ghost back-btn" @click="showOptions">← Zurück zur Übersicht</button>
       <article class="panel">
         <h2>Awareness – Anonym melden</h2>
-        <p class="sub" style="color:var(--brand-red)">Diese Meldung ist vollständig vertraulich und anonym. Deine Angaben werden nicht gespeichert oder weitergegeben.</p>
+        <p class="sub" style="color:var(--brand-red)">Diese Meldung ist vollständig vertraulich und anonym. Deine Angaben werden nicht gespeichert oder weitergegeben.<br>Du kannst uns auch immer unter awareness@stuk-leipzig.de erreichen!</p>
         <form class="form" @submit.prevent="submitForm('awareness')">
           <div class="input" style="grid-column:1/-1"><label>Event / Datum (optional)</label><input v-model="forms.awareness.event" placeholder="z.B. Dienstagsparty am 7.10."></div>
           <div class="input" style="grid-column:1/-1"><label>Was ist passiert?</label><textarea v-model="forms.awareness.description" placeholder="Beschreibe den Vorfall. Du kannst anonym bleiben." required style="min-height:200px"></textarea></div>
@@ -213,7 +213,7 @@
             <p style="font-size:0.85rem; color:var(--muted); margin-bottom:12px">
               <strong>Hinweis:</strong> Diese Meldung ist anonym. Wenn du eine Rückmeldung wünschst, gib bitte freiwillig eine Kontaktmöglichkeit an.
             </p>
-            <button class="btn" type="submit">Anonym senden</button>
+            <button class="btn" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'Wird gesendet...' : 'Anonym senden' }}</button>
           </div>
         </form>
       </article>
@@ -233,10 +233,41 @@
         </div>
       </div>
     </section>
+
+    <!-- Success/Error Notification -->
+    <Transition name="notification">
+      <div v-if="showNotification" class="notification" :class="notificationType">
+        <div class="notification-content">
+          <div class="notification-icon">
+            <svg v-if="notificationType === 'success'" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+            <svg v-else width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <div class="notification-text">
+            <h4>{{ notificationTitle }}</h4>
+            <p>{{ notificationMessage }}</p>
+          </div>
+          <button class="notification-close" @click="closeNotification">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
+// Für die Ziel-Mails und die Texte: stuk-website\strapi-website\src\api\kontakt\controllers\kontakt.ts
+import { ref } from 'vue'
+
 useHead({
   title: 'StuK – Kontakt',
   meta: [
@@ -244,7 +275,48 @@ useHead({
   ]
 })
 
+const config = useRuntimeConfig()
+const strapiUrl = config.public.strapiUrl
+const emailToken = config.public.emailStrapiToken
+
 const activeForm = ref<string | null>(null)
+const isSubmitting = ref(false)
+const submitError = ref<string | null>(null)
+const submitSuccess = ref(false)
+
+// Notification state
+const showNotification = ref(false)
+const notificationType = ref<'success' | 'error'>('success')
+const notificationTitle = ref('')
+const notificationMessage = ref('')
+
+function showSuccessNotification(title: string, message: string) {
+  notificationType.value = 'success'
+  notificationTitle.value = title
+  notificationMessage.value = message
+  showNotification.value = true
+
+  // Auto-close nach 5 Sekunden
+  setTimeout(() => {
+    closeNotification()
+  }, 5000)
+}
+
+function showErrorNotification(title: string, message: string) {
+  notificationType.value = 'error'
+  notificationTitle.value = title
+  notificationMessage.value = message
+  showNotification.value = true
+
+  // Auto-close nach 8 Sekunden (Fehler etwas länger anzeigen)
+  setTimeout(() => {
+    closeNotification()
+  }, 8000)
+}
+
+function closeNotification() {
+  showNotification.value = false
+}
 
 const forms = ref({
   general: {
@@ -293,23 +365,98 @@ const forms = ref({
 
 const showForm = (formType: string) => {
   activeForm.value = formType
+  submitError.value = null
+  submitSuccess.value = false
 }
 
 const showOptions = () => {
   activeForm.value = null
+  submitError.value = null
+  submitSuccess.value = false
 }
 
-const submitForm = (formType: string) => {
-  const messages: Record<string, string> = {
-    general: 'Danke! Wir melden uns bald.',
-    booking: 'Danke! Wir prüfen deine Anfrage.',
-    lost: 'Wir schauen nach und melden uns!',
-    board: 'Deine Nachricht wurde an den Vorstand weitergeleitet.',
-    join: 'Danke für dein Interesse! Wir melden uns.',
-    awareness: 'Deine Meldung wurde anonym übermittelt. Danke für dein Vertrauen.'
+const submitForm = async (formType: string) => {
+  isSubmitting.value = true
+  submitError.value = null
+  submitSuccess.value = false
+
+  const successMessages: Record<string, { title: string; message: string }> = {
+    general: {
+      title: 'Nachricht gesendet!',
+      message: 'Vielen Dank für deine Nachricht. Wir melden uns bald bei dir.'
+    },
+    booking: {
+      title: 'Buchungsanfrage erhalten!',
+      message: 'Wir prüfen deine Anfrage und melden uns schnellstmöglich bei dir.'
+    },
+    lost: {
+      title: 'Anfrage erhalten!',
+      message: 'Wir schauen nach deinem verlorenen Gegenstand und melden uns bei dir.'
+    },
+    board: {
+      title: 'An Vorstand weitergeleitet!',
+      message: 'Deine Nachricht wurde erfolgreich an den Vorstand weitergeleitet.'
+    },
+    join: {
+      title: 'Bewerbung erhalten!',
+      message: 'Vielen Dank für dein Interesse! Wir melden uns zeitnah bei dir.'
+    },
+    awareness: {
+      title: 'Meldung übermittelt',
+      message: 'Deine Meldung wurde anonym übermittelt. Danke für dein Vertrauen.'
+    }
   }
 
-  alert(messages[formType])
+  try {
+    const response = await $fetch(`${strapiUrl}/api/kontakt/send-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${emailToken}`,
+      },
+      body: {
+        formType,
+        data: forms.value[formType as keyof typeof forms.value],
+      },
+    })
+
+    if (response && response.success) {
+      submitSuccess.value = true
+
+      const { title, message } = successMessages[formType] || {
+        title: 'Erfolgreich gesendet!',
+        message: 'Deine Nachricht wurde erfolgreich versendet.'
+      }
+
+      showSuccessNotification(title, message)
+
+      // Formular zurücksetzen
+      const formKeys = Object.keys(forms.value[formType as keyof typeof forms.value])
+      formKeys.forEach(key => {
+        ;(forms.value[formType as keyof typeof forms.value] as any)[key] = ''
+      })
+
+      // Nach 2 Sekunden zurück zur Übersicht
+      setTimeout(() => {
+        showOptions()
+      }, 2000)
+    }
+  } catch (error: any) {
+    console.error('=== Frontend E-Mail Fehler ===')
+    console.error('Full Error:', error)
+    console.error('Error Data:', error.data)
+    console.error('Error Response:', error.response)
+
+    const errorMessage = error.data?.error || error.data?.message || error.message || 'Unbekannter Fehler'
+    submitError.value = errorMessage
+
+    showErrorNotification(
+      'Fehler beim Senden',
+      'Die Nachricht konnte nicht versendet werden. Bitte versuche es später erneut oder kontaktiere uns direkt per E-Mail.'
+    )
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
@@ -409,6 +556,159 @@ const submitForm = (formType: string) => {
 @media (max-width: 640px) {
   .address-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Notification Styles */
+.notification {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 9999;
+  max-width: 420px;
+  width: calc(100% - 40px);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.notification.success {
+  background: linear-gradient(135deg, rgba(34, 139, 34, 0.15), rgba(50, 205, 50, 0.08));
+  border: 1px solid rgba(50, 205, 50, 0.3);
+}
+
+.notification.error {
+  background: linear-gradient(135deg, rgba(188, 43, 37, 0.15), rgba(220, 53, 69, 0.08));
+  border: 1px solid rgba(188, 43, 37, 0.3);
+}
+
+.notification-content {
+  padding: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.notification-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.notification.success .notification-icon {
+  background: rgba(34, 139, 34, 0.2);
+  color: #32cd32;
+}
+
+.notification.error .notification-icon {
+  background: rgba(188, 43, 37, 0.2);
+  color: var(--brand-red);
+}
+
+.notification-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-text h4 {
+  margin: 0 0 6px;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.notification-text p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.notification-close {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-close:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+/* Notification Transitions */
+.notification-enter-active {
+  animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.notification-leave-active {
+  animation: slideOutRight 0.3s cubic-bezier(0.4, 0, 1, 1);
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(calc(100% + 40px));
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(calc(100% + 40px));
+    opacity: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .notification {
+    top: 20px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    max-width: none;
+  }
+
+  .notification-content {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .notification-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .notification-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .notification-text h4 {
+    font-size: 0.95rem;
+  }
+
+  .notification-text p {
+    font-size: 0.85rem;
   }
 }
 </style>
