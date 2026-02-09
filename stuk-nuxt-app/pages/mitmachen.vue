@@ -325,7 +325,7 @@ onMounted(() => {
 
 <style scoped>
 .formular {
-  margin: 0px 12px 24px 12px;
+  margin: 0px auto 24px auto;
 }
 
 .hero-image {
