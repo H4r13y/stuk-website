@@ -2,13 +2,49 @@
  * Kontakt Controller - versendet E-Mails über das Strapi Email Plugin
  */
 
+/**
+ * Validiert das Cloudflare Turnstile Token
+ */
+async function validateTurnstileToken(token: string): Promise<boolean> {
+  const secretKey = process.env.TURNSTILE_SECRET_KEY || '0x4AAAAAACZyLFD4mMAmHUU0o_-FswVAdWg';
+
+  try {
+    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        secret: secretKey,
+        response: token,
+      }),
+    });
+
+    const result = await response.json() as { success: boolean };
+    return result.success === true;
+  } catch (error) {
+    console.error('Turnstile validation error:', error);
+    return false;
+  }
+}
+
 export default {
   async sendEmail(ctx) {
     try {
-      const { formType, data } = ctx.request.body;
+      const { formType, data, turnstileToken } = ctx.request.body;
 
       if (!formType || !data) {
         return ctx.badRequest('Formulartyp und Daten sind erforderlich');
+      }
+
+      // Validiere Turnstile Token
+      if (!turnstileToken) {
+        return ctx.badRequest('Captcha-Token fehlt');
+      }
+
+      const isValidToken = await validateTurnstileToken(turnstileToken);
+      if (!isValidToken) {
+        return ctx.badRequest('Ungültiges Captcha-Token');
       }
 
       // Email-Empfänger basierend auf Formulartyp

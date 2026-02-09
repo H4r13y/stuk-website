@@ -1,6 +1,6 @@
 <template>
   <div>
-    <section class="container" style="padding-top: 40px;">
+    <section class="container header-section">
       <h1>Kontakt</h1>
       <p class="sub">Wähle, wie wir dir helfen können</p>
     </section>
@@ -84,7 +84,10 @@
           <div class="input"><label>Name</label><input v-model="forms.general.name" placeholder="Dein Name" required></div>
           <div class="input"><label>E-Mail</label><input v-model="forms.general.email" type="email" placeholder="du@beispiel.de" required></div>
           <div class="input" style="grid-column:1/-1"><label>Nachricht</label><textarea v-model="forms.general.message" placeholder="Worum geht's?" required></textarea></div>
-          <div style="grid-column:1/-1"><button class="btn" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'Wird gesendet...' : 'Senden' }}</button></div>
+          <div style="grid-column:1/-1">
+            <NuxtTurnstile v-model="turnstileToken" />
+          </div>
+          <div style="grid-column:1/-1"><button class="btn" type="submit" :disabled="isSubmitting || !turnstileToken">{{ isSubmitting ? 'Wird gesendet...' : 'Senden' }}</button></div>
         </form>
       </article>
     </section>
@@ -140,7 +143,10 @@
             </small>
           </div>
           <div class="input" style="grid-column:1/-1"><label>Sonderwünsche / Anmerkungen</label><textarea v-model="forms.booking.notes" placeholder="Besondere Anforderungen, Vorband, weitere Infos, etc." rows="5"></textarea></div>
-          <div style="grid-column:1/-1"><button class="btn" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'Wird gesendet...' : 'Anfrage senden' }}</button></div>
+          <div style="grid-column:1/-1">
+            <NuxtTurnstile v-model="turnstileToken" />
+          </div>
+          <div style="grid-column:1/-1"><button class="btn" type="submit" :disabled="isSubmitting || !turnstileToken">{{ isSubmitting ? 'Wird gesendet...' : 'Anfrage senden' }}</button></div>
         </form>
       </article>
     </section>
@@ -155,7 +161,10 @@
           <div class="input"><label>E-Mail</label><input v-model="forms.lost.email" type="email" placeholder="du@beispiel.de" required></div>
           <div class="input" style="grid-column:1/-1"><label>Event / Datum</label><input v-model="forms.lost.event" placeholder="z.B. Quizlabor am 2.10." required></div>
           <div class="input" style="grid-column:1/-1"><label>Was hast du verloren?</label><textarea v-model="forms.lost.description" placeholder="Beschreibe den Gegenstand möglichst genau" required></textarea></div>
-          <div style="grid-column:1/-1"><button class="btn" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'Wird gesendet...' : 'Anfrage senden' }}</button></div>
+          <div style="grid-column:1/-1">
+            <NuxtTurnstile v-model="turnstileToken" />
+          </div>
+          <div style="grid-column:1/-1"><button class="btn" type="submit" :disabled="isSubmitting || !turnstileToken">{{ isSubmitting ? 'Wird gesendet...' : 'Anfrage senden' }}</button></div>
         </form>
       </article>
     </section>
@@ -170,7 +179,10 @@
           <div class="input"><label>E-Mail</label><input v-model="forms.board.email" type="email" placeholder="kontakt@beispiel.de" required></div>
           <div class="input" style="grid-column:1/-1"><label>Betreff</label><input v-model="forms.board.subject" placeholder="Worum geht es?" required></div>
           <div class="input" style="grid-column:1/-1"><label>Nachricht</label><textarea v-model="forms.board.message" placeholder="Dein Anliegen" required></textarea></div>
-          <div style="grid-column:1/-1"><button class="btn" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'Wird gesendet...' : 'An Vorstand senden' }}</button></div>
+          <div style="grid-column:1/-1">
+            <NuxtTurnstile v-model="turnstileToken" />
+          </div>
+          <div style="grid-column:1/-1"><button class="btn" type="submit" :disabled="isSubmitting || !turnstileToken">{{ isSubmitting ? 'Wird gesendet...' : 'An Vorstand senden' }}</button></div>
         </form>
       </article>
     </section>
@@ -196,7 +208,10 @@
               <option>Orga</option>
             </select>
           </div>
-          <div style="grid-column:1/-1"><button class="btn" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'Wird gesendet...' : 'Bewerbung senden' }}</button></div>
+          <div style="grid-column:1/-1">
+            <NuxtTurnstile v-model="turnstileToken" />
+          </div>
+          <div style="grid-column:1/-1"><button class="btn" type="submit" :disabled="isSubmitting || !turnstileToken">{{ isSubmitting ? 'Wird gesendet...' : 'Bewerbung senden' }}</button></div>
         </form>
       </article>
     </section>
@@ -210,22 +225,25 @@
           <div class="input" style="grid-column:1/-1"><label>Event / Datum (optional)</label><input v-model="forms.awareness.event" placeholder="z.B. Dienstagsparty am 7.10."></div>
           <div class="input" style="grid-column:1/-1"><label>Was ist passiert?</label><textarea v-model="forms.awareness.description" placeholder="Beschreibe den Vorfall. Du kannst anonym bleiben." required style="min-height:200px"></textarea></div>
           <div style="grid-column:1/-1">
+            <NuxtTurnstile v-model="turnstileToken" />
+          </div>
+          <div style="grid-column:1/-1">
             <p style="font-size:0.85rem; color:var(--muted); margin-bottom:12px">
               <strong>Hinweis:</strong> Diese Meldung ist anonym. Wenn du eine Rückmeldung wünschst, gib bitte freiwillig eine Kontaktmöglichkeit an.
             </p>
-            <button class="btn" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'Wird gesendet...' : 'Anonym senden' }}</button>
+            <button class="btn" type="submit" :disabled="isSubmitting || !turnstileToken">{{ isSubmitting ? 'Wird gesendet...' : 'Anonym senden' }}</button>
           </div>
         </form>
       </article>
     </section>
 
-    <section class="container" style="margin-top:48px">
+    <section class="container address-section">
       <h2>Adresse & Öffnungszeiten</h2>
       <div class="panel address-grid">
         <div>
           <h3>StuK Leipzig</h3>
           <p>Nürnberger Straße 42<br>04103 Leipzig</p>
-          <p class="sub">kontakt@stuk-leipzig.de</p>
+          <p class="sub">info@stuk-leipzig.de</p>
         </div>
         <div>
           <h3>Öffnungszeiten</h3>
@@ -283,6 +301,9 @@ const activeForm = ref<string | null>(null)
 const isSubmitting = ref(false)
 const submitError = ref<string | null>(null)
 const submitSuccess = ref(false)
+
+// Turnstile Token
+const turnstileToken = ref<string | null>(null)
 
 // Notification state
 const showNotification = ref(false)
@@ -408,6 +429,15 @@ const submitForm = async (formType: string) => {
   }
 
   try {
+    // Validiere Turnstile Token
+    if (!turnstileToken.value) {
+      showErrorNotification(
+        'Captcha erforderlich',
+        'Bitte bestätige, dass du kein Roboter bist.'
+      )
+      return
+    }
+
     const response = await $fetch(`${strapiUrl}/api/kontakt/send-email`, {
       method: 'POST',
       headers: {
@@ -417,6 +447,7 @@ const submitForm = async (formType: string) => {
       body: {
         formType,
         data: forms.value[formType as keyof typeof forms.value],
+        turnstileToken: turnstileToken.value,
       },
     })
 
@@ -435,6 +466,9 @@ const submitForm = async (formType: string) => {
       formKeys.forEach(key => {
         ;(forms.value[formType as keyof typeof forms.value] as any)[key] = ''
       })
+
+      // Turnstile Token zurücksetzen
+      turnstileToken.value = null
 
       // Nach 2 Sekunden zurück zur Übersicht
       setTimeout(() => {
@@ -461,6 +495,31 @@ const submitForm = async (formType: string) => {
 </script>
 
 <style scoped>
+.container {
+ margin-top: 0px;
+ padding-top: 0px;
+}
+
+.header-section {
+  padding-top: 0px;
+}
+
+@media (max-width: 640px) {
+  .header-section {
+    padding-top: 0px;
+  }
+}
+
+.address-section {
+  margin-top: 0px;
+}
+
+@media (max-width: 640px) {
+  .address-section {
+    margin-top: 0px;
+  }
+}
+
 .contact-options {
   display: grid;
   gap: 18px;
@@ -477,9 +536,11 @@ const submitForm = async (formType: string) => {
 @media (max-width: 640px) {
   .contact-options {
     grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    gap: 12px;
+    margin: 0px 0;
   }
 }
+
 
 .contact-card {
   background: linear-gradient(180deg, #111215, #0f1012);
@@ -550,12 +611,18 @@ const submitForm = async (formType: string) => {
 .address-grid {
   display: grid;
   gap: 24px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 @media (max-width: 640px) {
   .address-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .address-grid > div {
+    width: 100%;
+    min-width: 0;
   }
 }
 

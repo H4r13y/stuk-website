@@ -23,8 +23,8 @@
           <h3>Interesse?</h3>
           <p>
             Schreib uns eine Mail an
-            <a href="mailto:kontakt@stuk-leipzig.de" style="color: var(--brand-red);">
-              kontakt@stuk-leipzig.de
+            <a href="mailto:info@stuk-leipzig.de" style="color: var(--brand-red);">
+              info@stuk-leipzig.de
             </a>
             oder komm einfach bei einem unserer Events vorbei!
           </p>

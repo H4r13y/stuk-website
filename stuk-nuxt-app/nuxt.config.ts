@@ -19,7 +19,12 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ['@nuxtjs/strapi'],
+  modules: ['@nuxtjs/strapi', '@nuxtjs/turnstile'],
+
+  /* Cloudflare Turnstile Konfiguration */
+  turnstile: {
+    siteKey: '0x4AAAAAACZyLJxV7XmO-i75',
+  },
 
   /* Strapi Modul Konfiguration */
   strapi: {

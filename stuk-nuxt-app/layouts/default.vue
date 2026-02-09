@@ -25,12 +25,12 @@
       <div class="container meta-grid">
         <div>
           <strong>StuK Leipzig</strong>
-          <p class="sub">Party mit Prinzipien - Kein Platz für Hass.</p>
+          <p class="sub">Party mit Prinzipien - Kein Platz für Hass, Intoleranzen und Diskriminierung.</p>
         </div>
         <div>
           <strong>Kontakt</strong>
           <p class="sub">
-            kontakt@stuk-leipzig.de<br>
+            info@stuk-leipzig.de<br>
             Nürnberger Straße 42, 04103 Leipzig
           </p>
         </div>
