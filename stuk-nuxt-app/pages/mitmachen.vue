@@ -72,7 +72,7 @@
             <div class="step-number">4</div>
             <div class="step-content">
               <div class="step-title">Vollmitglied</div>
-              <div class="step-desc">6 Dienste + 2 Arbeitseinsätze pro Semester + 1 Schulung pro Jahr</div>
+              <div class="step-desc">Dein Mitgliedsbeitrag: <br>6 Dienste + 2 Arbeitseinsätze pro Semester + 1 Schulung pro Jahr</div>
             </div>
           </div>
         </div>
@@ -99,7 +99,7 @@
       </div>
     </section>
 
-    <section class="container panel">
+    <section class="container panel formular">
       <h2>Kurzbewerbung</h2>
       <p class="sub">Füll einfach das Formular aus – wir melden uns bei dir!</p>
       <form class="form" @submit.prevent="submitForm">
@@ -109,7 +109,7 @@
         </div>
         <div class="input">
           <label>E-Mail</label>
-          <input v-model="formData.email" type="email" placeholder="max@uni.de" required>
+          <input v-model="formData.email" type="email" placeholder="max@gmail.com" required>
         </div>
         <div class="input" style="grid-column:1/-1">
           <label>Telefonnummer (freiwillig)</label>
@@ -324,6 +324,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.formular {
+  margin: 0px 12px 24px 12px;
+}
+
 .hero-image {
   width: 100%;
   height: 350px;

@@ -64,6 +64,7 @@ export default {
         board: 'vorstand@stuk-leipzig.de',
         join: 'vorstand@stuk-leipzig.de',
         awareness: 'vorstand@stuk-leipzig.de',
+        pfand: 'vorstand@stuk-leipzig.de',
       };
 
       // const recipient = emailRecipients[formType] || 'kontakt@stuk-leipzig.de';
@@ -78,6 +79,7 @@ export default {
         board: 'Anfrage an Vorstand',
         join: 'Neue Bewerbung',
         awareness: '[AWARENESS] Neue Meldung',
+        pfand: 'Neue Pfand-Bewerbung',
       };
 
       const subject = subjectMap[formType] || 'Neue Kontaktanfrage';
@@ -175,6 +177,18 @@ HINWEIS: Diese Meldung wurde anonym eingereicht. Kontaktdaten wurden nicht erfas
           `;
           break;
 
+        case 'pfand':
+          emailBody = `
+Neue Pfand-Bewerbung (über Pfandmarken-Seite):
+
+Name: ${data.name}
+E-Mail: ${data.email}
+Telefon: ${data.phone || 'Nicht angegeben'}
+
+HINWEIS: Diese Bewerbung kam über die humorvolle Pfandmarken-Seite.
+          `;
+          break;
+
         default:
           emailBody = `
 Neue Kontaktanfrage:
@@ -200,6 +214,7 @@ ${JSON.stringify(data, null, 2)}
           lost: 'Vielen Dank für deine Anfrage! Wir schauen nach deinem verlorenen Gegenstand.',
           board: 'Vielen Dank für deine Nachricht an den Vorstand. Wir melden uns bald.',
           join: 'Vielen Dank für dein Interesse am StuK! Wir melden uns zeitnah bei dir.',
+          pfand: 'Vielen Dank für dein Interesse am StuK! Wir melden uns zeitnah bei dir.',
         };
 
         const confirmationText = confirmationMessages[formType] || 'Vielen Dank für deine Nachricht!';
