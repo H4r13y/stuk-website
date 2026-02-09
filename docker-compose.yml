@@ -61,6 +61,7 @@ services:
       dockerfile: Dockerfile
     container_name: nuxt-app
     restart: unless-stopped
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0 --port 3000"
     environment:
       STRAPI_URL: http://strapi:1337
       CHOKIDAR_USEPOLLING: "true"
@@ -68,7 +69,6 @@ services:
     volumes:
       - ./stuk-nuxt-app:/app
       - /app/node_modules
-      - /app/.nuxt
     ports:
       - "3000:3000"
       - "24678:24678"
@@ -76,6 +76,7 @@ services:
       - stuk-network
     depends_on:
       - strapi
+
 
 volumes:
   postgres-data:
