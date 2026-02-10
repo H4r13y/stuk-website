@@ -4,18 +4,53 @@
       <h1>Über den StuK</h1>
       <p class="sub">Studentischer Klub seit den 90ern – Kultur, Bar & Gemeinschaft.</p>
 
-      <div v-if="ueberUnsHtml" class="markdown-content" v-html="ueberUnsHtml"></div>
-      <!-- <p v-else style="margin-top:24px; color:var(--text); line-height:1.7">
-        Der StuK Leipzig ist mehr als nur ein Club – er ist ein selbstverwalteter Freiraum von Studierenden für Studierende. Seit 1997 am Bayerischen Bahnhof beheimatet,
-        leben wir Basisdemokratie, Ehrenamt und Gemeinschaft. Hier gibt es keine kommerziellen Interessen, keine Türsteher mit Attitüde, sondern günstige Getränke,
-        vielfältige Events und Menschen, die gemeinsam anpacken. Ob an der Bar, hinter der Technik, beim Awareness-Team oder im Clubrat – jede:r kann mitmachen,
-        mitgestalten und Teil von etwas Besonderem werden. Denn der StuK gehört nicht einer Firma, sondern uns allen.
-      </p> -->
+      <!-- Über uns: Desktop voll, Mobile gekürzt + Modal -->
+      <div v-if="ueberUnsHtml" class="ueber-text">
+        <!-- Desktop / Tablet: volle Länge -->
+        <div class="markdown-content desktop-only" v-html="ueberUnsHtml"></div>
+
+        <!-- Mobile: gekürzt -->
+        <div class="mobile-only">
+          <div class="markdown-content markdown-collapsed" v-html="ueberUnsHtml"></div>
+
+          <button class="read-more-btn" @click="showUeberModal = true">
+            …mehr
+          </button>
+        </div>
+      </div>
+
     </section>
+    <!-- Über uns Modal (Mobile Bottom Sheet) -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="showUeberModal" class="ueber-modal-overlay" @click="showUeberModal = false">
+          <div class="ueber-modal" @click.stop>
+            <div class="ueber-modal-header">
+              <h3>Über den StuK</h3>
+              <button class="close-btn" @click="showUeberModal = false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="ueber-modal-content">
+              <div class="markdown-content" v-html="ueberUnsHtml"></div>
+            </div>
+
+            <div class="ueber-modal-footer">
+              <button class="btn primary" @click="showUeberModal = false">Schließen</button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
 
     <section class="container">
       <h2>Unser Klubrat</h2>
-      <p class="sub" style="margin-bottom:24px">{{ klubratCount }} engagierte Menschen, die den StuK mit Leidenschaft gestalten</p>
+      <p class="sub" style="margin-bottom:24px">{{ klubratCount }} engagierte Menschen, die den StuK mit Leidenschaft
+        gestalten</p>
 
       <div v-if="klubratPending" class="loading">Lade Klubrat...</div>
       <div v-else-if="klubratError" class="error">Fehler beim Laden der Klubratsmitglieder</div>
@@ -32,7 +67,8 @@
 
     <section class="container">
       <h2>Zu uns gehört noch viel mehr</h2>
-      <p class="sub" style="margin-bottom:24px">Über 50 aktive Mitglieder gestalten den StuK – an der Bar, am Einlass, in der Technik und überall dazwischen</p>
+      <p class="sub" style="margin-bottom:24px">Über 50 aktive Mitglieder gestalten den StuK – an der Bar, am Einlass,
+        in der Technik und überall dazwischen</p>
 
       <div class="assembly-photo" style="background-image:url('/bilder/WhatsApp Image 2025-10-16 at 11.29.00.jpeg')">
         <div class="assembly-overlay">
@@ -43,15 +79,16 @@
       <div v-if="collagePending" class="loading">Lade Galerie...</div>
       <div v-else-if="collageError" class="error">Fehler beim Laden der Galerie</div>
       <div v-else class="member-collage">
-        <div
-          v-for="(image, index) in galleryImages"
-          :key="index"
-          class="collage-item"
-          :class="getCollageItemClass(index)"
-          :style="{ backgroundImage: `url('${image.previewSrc}')` }"
-          :title="image.caption"
-          @click="openGallery(index)"
-        ></div>
+        <div v-for="(image, index) in visibleGalleryImages" :key="index" class="collage-item"
+          :class="getCollageItemClass(index)" :style="{ backgroundImage: `url('${image.previewSrc}')` }"
+          :title="image.caption" @click="openGallery(index)"></div>
+      </div>
+
+      <!-- Mobile: Load more -->
+      <div v-if="canLoadMoreGallery" class="gallery-loadmore">
+        <button class="read-more-btn" @click="loadMoreGallery">
+          Mehr Bilder laden ({{ Math.min(mobileVisibleCount + 10, galleryImages.length) }}/{{ galleryImages.length }})
+        </button>
       </div>
     </section>
 
@@ -63,13 +100,8 @@
         <h3 class="timeline-header__subtitle">VON DER GRÜNDUNG BIS HEUTE</h3>
       </div>
       <div class="timeline" ref="timelineRef">
-        <div
-          v-for="(event, index) in timelineEvents"
-          :key="index"
-          class="timeline-item"
-          :class="{ 'timeline-item--active': activeTimelineIndex === index }"
-          :data-text="event.label"
-        >
+        <div v-for="(event, index) in timelineEvents" :key="index" class="timeline-item"
+          :class="{ 'timeline-item--active': activeTimelineIndex === index }" :data-text="event.label">
           <div class="timeline__content">
             <img class="timeline__img" :src="event.image" :alt="event.label" />
             <h2 class="timeline__content-title">{{ event.year }}</h2>
@@ -84,17 +116,16 @@
   <div v-if="selectedMember" class="council-modal active" @click.self="closeModal">
     <div class="council-modal-content">
       <button class="close-modal" @click="closeModal">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <path d="M18 6L6 18M6 6l12 12" />
         </svg>
       </button>
 
-      <!-- large background image in modal header -->
-      <div class="modal-header" :style="getHeaderStyle(selectedMember)"></div>
-
       <div class="modal-body">
         <!-- medium in modal -->
-        <img class="modal-avatar-small" :src="getImageUrl(selectedMember.Profilbild, 'medium')" :alt="selectedMember.Name" />
+        <img class="modal-avatar-small" :src="getImageUrl(selectedMember.Profilbild, 'medium')"
+          :alt="selectedMember.Name" />
         <h2>{{ selectedMember.Name }}</h2>
         <p class="modal-role">{{ selectedMember.Posten }}</p>
         <p class="bio">{{ selectedMember.Kurzbeschreibung }}</p>
@@ -111,31 +142,29 @@
   <!-- Gallery Lightbox -->
   <div v-if="galleryActive" class="gallery-lightbox active" @click.self="closeGallery">
     <button class="gallery-close-btn" @click="closeGallery">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
         <path d="M18 6L6 18M6 6l12 12" />
       </svg>
     </button>
 
     <button class="gallery-nav-btn prev" @click="navigateGallery(-1)">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
         <path d="M15 18l-6-6 6-6" />
       </svg>
     </button>
 
     <button class="gallery-nav-btn next" @click="navigateGallery(1)">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 18l6-6-6-6" />
       </svg>
     </button>
 
     <div class="gallery-lightbox-content">
-      <img
-        class="gallery-lightbox-image"
-        :src="galleryImages[currentGalleryIndex]?.fullSrc"
-        :alt="galleryImages[currentGalleryIndex]?.alt"
-        loading="eager"
-        decoding="async"
-      />
+      <img class="gallery-lightbox-image" :src="galleryImages[currentGalleryIndex]?.fullSrc"
+        :alt="galleryImages[currentGalleryIndex]?.alt" loading="eager" decoding="async" />
       <div v-if="galleryImages[currentGalleryIndex]?.caption" class="gallery-lightbox-caption">
         <p>{{ galleryImages[currentGalleryIndex].caption }}</p>
       </div>
@@ -145,6 +174,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+const showUeberModal = ref(false)
 
 // Types
 type StrapiMedia = {
@@ -287,16 +317,6 @@ function getAvatarStyle(member: Klubrat) {
   }
 }
 
-function getHeaderStyle(member: Klubrat) {
-  // modal header: large
-  const imageUrl = getImageUrl(member.Profilbild, 'large')
-  return {
-    backgroundImage: `url('${imageUrl}')`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-  }
-}
-
 // Markdown-Rendering für Über-uns Text
 const ueberUnsHtml = ref('')
 
@@ -381,6 +401,7 @@ const galleryImages = computed(() => {
 const tallIndices = [0, 5, 11]
 const wideIndices = [3, 8]
 function getCollageItemClass(index: number) {
+  if (isMobile.value) return {} // Mobile: keine tall/wide Layout-Spielereien
   return {
     tall: tallIndices.includes(index),
     wide: wideIndices.includes(index),
@@ -433,7 +454,6 @@ function navigateGallery(direction: number) {
   }
 }
 
-// Keyboard events
 function handleKeydown(e: KeyboardEvent) {
   if (selectedMember.value && e.key === 'Escape') closeModal()
 
@@ -442,9 +462,53 @@ function handleKeydown(e: KeyboardEvent) {
     else if (e.key === 'ArrowLeft') navigateGallery(-1)
     else if (e.key === 'ArrowRight') navigateGallery(1)
   }
+
+  if (showUeberModal.value && e.key === 'Escape') showUeberModal.value = false
+}
+watch(showUeberModal, (open) => {
+  document.body.style.overflow = open ? 'hidden' : ''
+})
+
+// --- Mobile Gallery Pagination ---
+const isMobile = ref(false)
+
+function updateIsMobile() {
+  isMobile.value = window.innerWidth <= 640
 }
 
+const mobileBatchSize = 10
+const mobileVisibleCount = ref(mobileBatchSize)
+
+const visibleGalleryImages = computed(() => {
+  // Desktop: alles zeigen
+  if (!isMobile.value) return galleryImages.value
+  // Mobile: nur Teil zeigen
+  return galleryImages.value.slice(0, mobileVisibleCount.value)
+})
+
+const canLoadMoreGallery = computed(() => {
+  return isMobile.value && mobileVisibleCount.value < galleryImages.value.length
+})
+
+function loadMoreGallery() {
+  mobileVisibleCount.value = Math.min(
+    mobileVisibleCount.value + mobileBatchSize,
+    galleryImages.value.length
+  )
+}
+
+// Wenn neue Bilder kommen (Fetch), wieder auf initial setzen
+watch(
+  () => galleryImages.value.length,
+  () => {
+    mobileVisibleCount.value = mobileBatchSize
+  }
+)
+
+
 onMounted(() => {
+  updateIsMobile()
+  window.addEventListener('resize', updateIsMobile)
   window.addEventListener('scroll', checkTimelineItems)
   window.addEventListener('resize', checkTimelineItems)
   window.addEventListener('keydown', handleKeydown)
@@ -459,6 +523,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  window.removeEventListener('resize', updateIsMobile)
   window.removeEventListener('scroll', checkTimelineItems)
   window.removeEventListener('resize', checkTimelineItems)
   window.removeEventListener('keydown', handleKeydown)
@@ -572,6 +637,7 @@ onUnmounted(() => {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -594,26 +660,11 @@ onUnmounted(() => {
     transform: translateY(50px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
   }
-}
-
-.modal-header {
-  position: relative;
-  height: 300px;
-  background: radial-gradient(circle at 30% 20%, rgba(188, 43, 37, 0.2), transparent 60%),
-    radial-gradient(circle at 70% 80%, rgba(36, 58, 92, 0.2), transparent 60%), #0f1114;
-  background-size: cover;
-  background-position: center;
-}
-
-.modal-header::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, transparent 50%, rgba(15, 16, 18, 1) 100%);
 }
 
 .close-modal {
@@ -648,7 +699,7 @@ onUnmounted(() => {
   height: 120px;
   border-radius: 50%;
   border: 4px solid rgba(188, 43, 37, 0.4);
-  margin: -80px auto 20px;
+  margin: 0 auto 20px;
   display: block;
   position: relative;
   z-index: 5;
@@ -765,13 +816,30 @@ onUnmounted(() => {
 }
 
 @media (max-width: 640px) {
+  .member-collage {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    /* 4 pro Reihe */
+    gap: 6px;
+  }
+
+  .collage-item {
+    height: 90px;
+    /* kleiner -> mehr sichtbar */
+    border-radius: 10px;
+    /* optional etwas kleiner */
+  }
+}
+
+@media (max-width: 640px) {
   .collage-item.wide {
     grid-column: span 1;
   }
+
   .collage-item.tall {
     grid-row: span 1;
     height: 200px;
   }
+
   .assembly-photo {
     height: 300px;
   }
@@ -887,18 +955,22 @@ onUnmounted(() => {
     width: 40px;
     height: 40px;
   }
+
   .gallery-nav-btn.prev {
     left: 10px;
   }
+
   .gallery-nav-btn.next {
     right: 10px;
   }
+
   .gallery-close-btn {
     top: 10px;
     right: 10px;
     width: 40px;
     height: 40px;
   }
+
   .gallery-lightbox-caption {
     padding: 16px;
     font-size: 0.9rem;
@@ -1076,10 +1148,12 @@ onUnmounted(() => {
   .timeline-container {
     padding: 40px 0;
   }
+
   .timeline:before {
     left: 20px;
     width: 3px;
   }
+
   .timeline-item {
     align-self: baseline !important;
     width: 100%;
@@ -1088,6 +1162,7 @@ onUnmounted(() => {
     filter: blur(0);
     transform: translateY(0);
   }
+
   .timeline-item:before {
     left: -5px !important;
     padding: 0 !important;
@@ -1099,9 +1174,11 @@ onUnmounted(() => {
     letter-spacing: 1px;
     opacity: 1;
   }
+
   .timeline-item:last-child {
     padding-bottom: 30px;
   }
+
   .timeline__img {
     max-width: 100%;
     height: 180px;
@@ -1109,9 +1186,11 @@ onUnmounted(() => {
     border-radius: 12px;
     margin-bottom: 12px;
   }
+
   .timeline__content {
     position: relative;
   }
+
   .timeline__content-title {
     font-size: 48px;
     margin: -10px 0 12px 0 !important;
@@ -1124,21 +1203,26 @@ onUnmounted(() => {
     border-radius: 0;
     backdrop-filter: none;
   }
+
   .timeline-item--active .timeline__content-title {
     margin: -10px 0 12px 0 !important;
   }
+
   .timeline__content-desc {
     font-size: 14px;
     line-height: 1.6;
     margin-top: 8px;
   }
+
   .timeline-header__title {
     font-size: 32px;
   }
+
   .timeline-header__subtitle {
     font-size: 13px;
     letter-spacing: 3px;
   }
+
   .timeline-header {
     margin-bottom: 40px;
   }
@@ -1227,5 +1311,178 @@ onUnmounted(() => {
   margin: 16px 0;
   color: var(--muted);
   font-style: italic;
+}
+
+/* Sichtbarkeit: Mobile vs Desktop */
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: block;
+  }
+}
+
+/* Mobile: Markdown gekürzt (Line Clamp) */
+.markdown-collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  /* <- Anzahl Zeilen: anpassen */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Optional: leichter Fade unten */
+.markdown-collapsed::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 48px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(12, 13, 15, 0.95));
+  pointer-events: none;
+}
+
+/* Read-more Button */
+.read-more-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(188, 43, 37, 0.18);
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.read-more-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(188, 43, 37, 0.28);
+  border-color: rgba(188, 43, 37, 0.35);
+}
+
+/* Über-Modal (Mobile Bottom Sheet) */
+.ueber-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+@media (min-width: 641px) {
+  .ueber-modal-overlay {
+    align-items: center;
+  }
+}
+
+.ueber-modal {
+  background: linear-gradient(135deg, #0f1013 0%, #1a1d24 100%);
+  border: 1px solid #ffffff22;
+  border-radius: var(--radius) var(--radius) 0 0;
+  width: 100%;
+  max-width: 700px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.6);
+}
+
+@media (min-width: 641px) {
+  .ueber-modal {
+    border-radius: var(--radius);
+    max-height: 75vh;
+  }
+}
+
+.ueber-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px;
+  border-bottom: 1px solid #ffffff12;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.ueber-modal-header h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.15rem;
+}
+
+.ueber-modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.ueber-modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid #ffffff12;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ueber-modal-footer .btn {
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.ueber-modal-footer .btn.primary {
+  background: var(--brand-red);
+  border-color: var(--brand-red);
+  color: white;
+}
+
+/* Transition name="modal" nutzt du schon – passt direkt */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active .ueber-modal,
+.modal-leave-active .ueber-modal {
+  transition: transform 0.25s ease;
+}
+
+.modal-enter-from .ueber-modal,
+.modal-leave-to .ueber-modal {
+  transform: translateY(100%);
+}
+
+@media (min-width: 641px) {
+
+  .modal-enter-from .ueber-modal,
+  .modal-leave-to .ueber-modal {
+    transform: translateY(20px) scale(0.97);
+  }
 }
 </style>
