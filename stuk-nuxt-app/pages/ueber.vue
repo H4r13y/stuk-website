@@ -210,7 +210,8 @@ const klubratCount = computed(() => klubrats.value.length)
 const { data: collageRes, pending: collagePending, error: collageError } = await useFetch<StrapiSingle<UeberCollage>>(
   `${strapiUrl}/api/ueber-collage?populate=*`,
   {
-    server: true,
+    lazy: true,
+    server: false,
   }
 )
 
