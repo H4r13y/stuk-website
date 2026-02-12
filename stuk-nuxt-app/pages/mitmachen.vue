@@ -88,7 +88,7 @@
           v-for="(role, key) in roles"
           :key="key"
           class="role-card"
-          @click="openRoleModal(key)"
+          @click="openRoleModal(String(key))"
         >
           <div class="role-card-image" :style="{ backgroundImage: `url('${role.image}')` }"></div>
           <div class="role-card-info">
@@ -102,19 +102,23 @@
     <section class="container panel formular">
       <h2>Kurzbewerbung</h2>
       <p class="sub">Füll einfach das Formular aus – wir melden uns bei dir!</p>
+
       <form class="form" @submit.prevent="submitForm">
         <div class="input">
           <label>Name</label>
           <input v-model="formData.name" placeholder="Max Mustermann" required>
         </div>
+
         <div class="input">
           <label>E-Mail</label>
           <input v-model="formData.email" type="email" placeholder="max@gmail.com" required>
         </div>
+
         <div class="input" style="grid-column:1/-1">
           <label>Telefonnummer (freiwillig)</label>
           <input v-model="formData.phone" type="tel" placeholder="Optional – falls wir dich anrufen sollen">
         </div>
+
         <div class="input" style="grid-column:1/-1">
           <label>Bereich</label>
           <select v-model="formData.bereich" required>
@@ -127,9 +131,16 @@
             <option>Orga</option>
           </select>
         </div>
+
         <div style="grid-column:1/-1">
-          <NuxtTurnstile v-model="turnstileToken" />
+          <ClientOnly>
+            <NuxtTurnstile
+              :key="turnstileKey"
+              v-model="turnstileToken"
+            />
+          </ClientOnly>
         </div>
+
         <div style="grid-column:1/-1">
           <button class="btn" type="submit" :disabled="isSubmitting || !turnstileToken">
             {{ isSubmitting ? 'Wird gesendet...' : 'Absenden' }}
@@ -180,27 +191,33 @@
                 </svg>
               </button>
             </div>
+
             <div class="role-modal-scroll">
               <div
                 class="role-modal-header"
                 :style="{ backgroundImage: selectedRole ? `url('${selectedRole.image}')` : '' }"
               ></div>
+
               <div class="role-modal-body" v-if="selectedRole">
                 <h2>{{ selectedRole.title }}</h2>
                 <p class="subtitle">{{ selectedRole.subtitle }}</p>
                 <p class="description">{{ selectedRole.description }}</p>
+
                 <h3>Deine Aufgaben</h3>
                 <ul>
                   <li v-for="(task, index) in selectedRole.tasks" :key="index">{{ task }}</li>
                 </ul>
+
                 <div>
                   <p class="description" v-html="selectedRole.note"></p>
                 </div>
               </div>
+
               <div class="role-modal-footer" v-if="selectedRole">
                 {{ selectedRole.footer }}
               </div>
             </div>
+
           </div>
         </div>
       </Transition>
@@ -209,7 +226,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 
 useHead({
   title: 'StuK – Mitmachen',
@@ -230,8 +247,14 @@ const formData = ref({
   bereich: ''
 })
 
-// Turnstile Token
+// Turnstile
 const turnstileToken = ref<string | null>(null)
+const turnstileKey = ref(0)
+
+function resetTurnstile() {
+  turnstileToken.value = null
+  turnstileKey.value++
+}
 
 // Submission state
 const isSubmitting = ref(false)
@@ -246,7 +269,7 @@ const notificationMessage = ref('')
 const modalActive = ref(false)
 const selectedRoleKey = ref<string | null>(null)
 
-// Role data
+// Role data (unverändert)
 const roles = {
   bar: {
     title: 'Bar',
@@ -338,39 +361,19 @@ const roles = {
     note: '<strong>Strukturiert arbeiten?</strong> Wir brauchen dich!',
     footer: 'Interessiert? Bewirb dich unten mit dem Formular!'
   }
-}
+} as const
 
 const selectedRole = computed(() => {
   return selectedRoleKey.value ? roles[selectedRoleKey.value as keyof typeof roles] : null
 })
 
-// Methods
-function openRoleModal(roleKey: string) {
-  selectedRoleKey.value = roleKey
-  modalActive.value = true
-}
-
-function closeRoleModal() {
-  modalActive.value = false
-  selectedRoleKey.value = null
-}
-
-function closeModalOnBackdrop(event: MouseEvent) {
-  if ((event.target as HTMLElement).classList.contains('role-modal')) {
-    closeRoleModal()
-  }
-}
-
+// Notifications
 function showSuccessNotification(title: string, message: string) {
   notificationType.value = 'success'
   notificationTitle.value = title
   notificationMessage.value = message
   showNotification.value = true
-
-  // Auto-close nach 5 Sekunden
-  setTimeout(() => {
-    closeNotification()
-  }, 5000)
+  setTimeout(closeNotification, 5000)
 }
 
 function showErrorNotification(title: string, message: string) {
@@ -378,27 +381,37 @@ function showErrorNotification(title: string, message: string) {
   notificationTitle.value = title
   notificationMessage.value = message
   showNotification.value = true
-
-  // Auto-close nach 8 Sekunden
-  setTimeout(() => {
-    closeNotification()
-  }, 8000)
+  setTimeout(closeNotification, 8000)
 }
 
 function closeNotification() {
   showNotification.value = false
 }
 
+// Modal
+function openRoleModal(roleKey: string) {
+  selectedRoleKey.value = roleKey
+  modalActive.value = true
+
+  // Turnstile ist empfindlich bei Reflow/Transform/Teleport -> sauber neu mounten
+  resetTurnstile()
+}
+
+function closeRoleModal() {
+  modalActive.value = false
+  selectedRoleKey.value = null
+
+  // Auch beim Schließen neu mounten (häufige Ursache für "NaN"-Spam)
+  resetTurnstile()
+}
+
+// Submit
 async function submitForm() {
   isSubmitting.value = true
 
   try {
-    // Validiere Turnstile Token
     if (!turnstileToken.value) {
-      showErrorNotification(
-        'Captcha erforderlich',
-        'Bitte bestätige, dass du kein Roboter bist.'
-      )
+      showErrorNotification('Captcha erforderlich', 'Bitte bestätige, dass du kein Roboter bist.')
       return
     }
 
@@ -420,48 +433,44 @@ async function submitForm() {
       },
     })
 
-    if (response && response.success) {
-      showSuccessNotification(
-        'Bewerbung erhalten!',
-        'Danke für dein Interesse! Wir melden uns zeitnah bei dir.'
-      )
+    if (response && (response as any).success) {
+      showSuccessNotification('Bewerbung erhalten!', 'Danke für dein Interesse! Wir melden uns zeitnah bei dir.')
 
-      // Formular zurücksetzen
-      formData.value = {
-        name: '',
-        email: '',
-        phone: '',
-        bereich: ''
-      }
+      formData.value = { name: '', email: '', phone: '', bereich: '' }
 
-      // Turnstile Token zurücksetzen
-      turnstileToken.value = null
+      // Wichtig: Turnstile danach hart resetten
+      resetTurnstile()
     }
   } catch (error: any) {
-    console.error('=== Frontend E-Mail Fehler (Mitmachen) ===')
-    console.error('Full Error:', error)
-    console.error('Error Data:', error.data)
-
+    console.error('=== Frontend E-Mail Fehler (Mitmachen) ===', error)
     showErrorNotification(
       'Fehler beim Senden',
       'Die Bewerbung konnte nicht versendet werden. Bitte versuche es später erneut oder kontaktiere uns direkt per E-Mail.'
     )
+
+    // Optional: auch nach Fehler resetten (Token könnte "verbraucht" sein)
+    resetTurnstile()
   } finally {
     isSubmitting.value = false
   }
 }
 
+// Body scroll lock + Escape
 watch(modalActive, (open) => {
   document.body.style.overflow = open ? 'hidden' : ''
 })
 
-// Handle Escape key
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape' && modalActive.value) closeRoleModal()
+}
+
 onMounted(() => {
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modalActive.value) {
-      closeRoleModal()
-    }
-  })
+  document.addEventListener('keydown', onKeydown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', onKeydown)
+  document.body.style.overflow = ''
 })
 </script>
 

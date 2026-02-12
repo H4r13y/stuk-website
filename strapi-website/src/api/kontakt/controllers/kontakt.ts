@@ -7,26 +7,43 @@
  */
 async function validateTurnstileToken(token: string): Promise<boolean> {
   const secretKey = process.env.TURNSTILE_SECRET_KEY;
+  if (!secretKey) {
+    strapi?.log?.error?.('TURNSTILE_SECRET_KEY fehlt');
+    return false;
+  }
 
   try {
+    const body = new URLSearchParams();
+    body.set('secret', secretKey);
+    body.set('response', token);
+
     const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({
-        secret: secretKey,
-        response: token,
-      }),
+      body,
     });
 
-    const result = await response.json() as { success: boolean };
+    const result = await response.json() as {
+      success: boolean;
+      'error-codes'?: string[];
+      hostname?: string;
+      action?: string;
+      cdata?: string;
+    };
+
+    if (!result.success) {
+      strapi?.log?.warn?.(`Turnstile fail: ${JSON.stringify(result)}`);
+    }
+
     return result.success === true;
   } catch (error) {
-    console.error('Turnstile validation error:', error);
+    strapi?.log?.error?.('Turnstile validation error', error);
     return false;
   }
 }
+
 
 export default {
   async sendEmail(ctx) {

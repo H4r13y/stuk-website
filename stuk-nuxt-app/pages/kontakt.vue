@@ -83,9 +83,13 @@
         <form class="form" @submit.prevent="submitForm('general')">
           <div class="input"><label>Name</label><input v-model="forms.general.name" placeholder="Dein Name" required></div>
           <div class="input"><label>E-Mail</label><input v-model="forms.general.email" type="email" placeholder="du@beispiel.de" required></div>
-          <div class="input" style="grid-column:1/-1"><label>Nachricht</label><textarea v-model="forms.general.message" placeholder="Worum geht's?" required></textarea></div>
+          <div class="input" style="grid-column:1/-1"><label>Nachricht</label><textarea v-model="forms.general.message"
+              placeholder="Worum geht's?" required></textarea></div>
           <div style="grid-column:1/-1">
-            <NuxtTurnstile v-model="turnstileToken" />
+            <ClientOnly>
+              <NuxtTurnstile :key="turnstileKey" v-model="turnstileToken" />
+            </ClientOnly>
+
           </div>
           <div style="grid-column:1/-1"><button class="btn" type="submit" :disabled="isSubmitting || !turnstileToken">{{ isSubmitting ? 'Wird gesendet...' : 'Senden' }}</button></div>
         </form>
@@ -304,6 +308,12 @@ const submitSuccess = ref(false)
 
 // Turnstile Token
 const turnstileToken = ref<string | null>(null)
+const turnstileKey = ref(0)
+
+function resetTurnstile() {
+  turnstileToken.value = null
+  turnstileKey.value++
+}
 
 // Notification state
 const showNotification = ref(false)
@@ -388,13 +398,16 @@ const showForm = (formType: string) => {
   activeForm.value = formType
   submitError.value = null
   submitSuccess.value = false
+  resetTurnstile()
 }
 
 const showOptions = () => {
   activeForm.value = null
   submitError.value = null
   submitSuccess.value = false
+  resetTurnstile()
 }
+
 
 const submitForm = async (formType: string) => {
   isSubmitting.value = true
