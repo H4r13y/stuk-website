@@ -6,7 +6,7 @@
  * Validiert das Cloudflare Turnstile Token
  */
 async function validateTurnstileToken(token: string): Promise<boolean> {
-  const secretKey = process.env.TURNSTILE_SECRET_KEY || '0x4AAAAAACZyLFD4mMAmHUU0o_-FswVAdWg';
+  const secretKey = process.env.TURNSTILE_SECRET_KEY;
 
   try {
     const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
