@@ -167,39 +167,49 @@
     </Transition>
 
     <!-- Role Modal -->
-    <div v-if="modalActive" class="role-modal active" @click="closeModalOnBackdrop">
-      <div class="role-modal-content">
-        <button class="close-role-modal" @click="closeRoleModal">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 6L6 18M6 6l12 12"/>
-          </svg>
-        </button>
-        <div
-          class="role-modal-header"
-          :style="{ backgroundImage: selectedRole ? `url('${selectedRole.image}')` : '' }"
-        ></div>
-        <div class="role-modal-body" v-if="selectedRole">
-          <h2>{{ selectedRole.title }}</h2>
-          <p class="subtitle">{{ selectedRole.subtitle }}</p>
-          <p class="description">{{ selectedRole.description }}</p>
-          <h3>Deine Aufgaben</h3>
-          <ul>
-            <li v-for="(task, index) in selectedRole.tasks" :key="index">{{ task }}</li>
-          </ul>
-          <div>
-            <p class="description" v-html="selectedRole.note"></p>
+    <Teleport to="body">
+      <Transition name="role-sheet">
+        <div v-if="modalActive" class="role-modal" @click.self="closeRoleModal">
+          <div class="role-modal-content">
+            <div class="role-modal-titlebar">
+              <h3 v-if="selectedRole">{{ selectedRole.title }}</h3>
+              <button class="close-btn" @click="closeRoleModal">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <div class="role-modal-scroll">
+              <div
+                class="role-modal-header"
+                :style="{ backgroundImage: selectedRole ? `url('${selectedRole.image}')` : '' }"
+              ></div>
+              <div class="role-modal-body" v-if="selectedRole">
+                <h2>{{ selectedRole.title }}</h2>
+                <p class="subtitle">{{ selectedRole.subtitle }}</p>
+                <p class="description">{{ selectedRole.description }}</p>
+                <h3>Deine Aufgaben</h3>
+                <ul>
+                  <li v-for="(task, index) in selectedRole.tasks" :key="index">{{ task }}</li>
+                </ul>
+                <div>
+                  <p class="description" v-html="selectedRole.note"></p>
+                </div>
+              </div>
+              <div class="role-modal-footer" v-if="selectedRole">
+                {{ selectedRole.footer }}
+              </div>
+            </div>
           </div>
         </div>
-        <div class="role-modal-footer" v-if="selectedRole">
-          {{ selectedRole.footer }}
-        </div>
-      </div>
-    </div>
+      </Transition>
+    </Teleport>
   </main>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 
 useHead({
   title: 'StuK – Mitmachen',
@@ -441,6 +451,10 @@ async function submitForm() {
   }
 }
 
+watch(modalActive, (open) => {
+  document.body.style.overflow = open ? 'hidden' : ''
+})
+
 // Handle Escape key
 onMounted(() => {
   document.addEventListener('keydown', (e) => {
@@ -541,37 +555,24 @@ onMounted(() => {
   bottom: 0;
   background: rgba(0,0,0,0.85);
   backdrop-filter: blur(8px);
-  z-index: 2000;
-  display: none;
+  z-index: 2200;
+  display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.role-modal.active {
-  display: flex;
-  opacity: 1;
-  animation: fadeIn 0.3s ease-in-out forwards;
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 .role-modal-content {
-  background: linear-gradient(180deg, #111215, #0f1012);
-  border: 1px solid #ffffff14;
+  background: linear-gradient(135deg, #0f1013 0%, #1a1d24 100%);
+  border: 1px solid #ffffff22;
   border-radius: var(--radius);
   max-width: 800px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  animation: slideUp 0.3s ease-out;
 }
-@keyframes slideUp {
-  from { transform: translateY(50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+.role-modal-titlebar {
+  display: none;
 }
 .role-modal-header {
   position: relative;
@@ -585,26 +586,125 @@ onMounted(() => {
   inset: 0;
   background: linear-gradient(to bottom, transparent 50%, rgba(15,16,18,1) 100%);
 }
-.close-role-modal {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: rgba(10,11,13,.9);
-  border: 1px solid rgba(255,255,255,.2);
-  color: #fff;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  transition: all 0.2s;
+
+/* Desktop: Close Button */
+@media (min-width: 641px) {
+  .role-modal-titlebar {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    padding: 16px;
+  }
+
+  .role-modal-titlebar h3 {
+    display: none;
+  }
+
+  .role-modal-titlebar .close-btn {
+    background: rgba(10,11,13,.9);
+    border: 1px solid rgba(255,255,255,.2);
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .role-modal-titlebar .close-btn:hover {
+    background: rgba(188,43,37,.9);
+    transform: scale(1.1);
+  }
 }
-.close-role-modal:hover {
-  background: rgba(188,43,37,.9);
-  transform: scale(1.1);
+
+/* Mobile: Bottom Sheet */
+@media (max-width: 640px) {
+  .role-modal {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .role-modal-content {
+    border-radius: var(--radius) var(--radius) 0 0;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+  }
+
+  .role-modal-titlebar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    border-bottom: 1px solid #ffffff12;
+    background: rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+  }
+
+  .role-modal-titlebar h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 1.15rem;
+  }
+
+  .role-modal-titlebar .close-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .role-modal-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 16px));
+  }
+
+  .role-modal-header {
+    height: 180px;
+  }
+}
+
+/* Role Sheet Transition */
+.role-sheet-enter-active,
+.role-sheet-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.role-sheet-enter-from,
+.role-sheet-leave-to {
+  opacity: 0;
+}
+
+.role-sheet-enter-active .role-modal-content,
+.role-sheet-leave-active .role-modal-content {
+  transition: transform 0.25s ease;
+}
+
+@media (max-width: 640px) {
+  .role-sheet-enter-from .role-modal-content,
+  .role-sheet-leave-to .role-modal-content {
+    transform: translateY(100%);
+  }
+}
+
+@media (min-width: 641px) {
+  .role-sheet-enter-from .role-modal-content,
+  .role-sheet-leave-to .role-modal-content {
+    transform: translateY(20px) scale(0.97);
+  }
 }
 .role-modal-body {
   padding: 32px;
@@ -653,9 +753,6 @@ onMounted(() => {
   font-weight: 600;
 }
 @media (max-width: 768px) {
-  .role-modal-header {
-    height: 200px;
-  }
   .role-modal-body {
     padding: 24px;
   }

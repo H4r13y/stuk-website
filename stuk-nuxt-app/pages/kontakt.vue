@@ -6,7 +6,7 @@
     </section>
 
     <section v-show="!activeForm" class="container" id="options-section">
-      <div class="contact-options">
+      <div class="contact-options" lang="de">
         <div class="contact-card" @click="showForm('general')">
           <div class="icon">
             <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -538,6 +538,15 @@ const submitForm = async (formType: string) => {
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
     margin: 0px 0;
+  }
+
+  .contact-card h3 {
+    font-size: 1rem;
+    hyphens: auto;
+  }
+
+  .contact-card p {
+    hyphens: auto;
   }
 }
 

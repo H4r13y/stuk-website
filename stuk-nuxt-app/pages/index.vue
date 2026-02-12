@@ -137,9 +137,25 @@ const currentMonth = computed(() => {
 })
 
 const todayOpeningInfo = computed(() => {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  const now = new Date()
 
+  // Zwischen 0:00 und 3:00 Uhr: prüfen ob gestern ein Event war (noch geöffnet)
+  if (now.getHours() < 3) {
+    const yesterday = new Date(now)
+    yesterday.setDate(yesterday.getDate() - 1)
+    yesterday.setHours(0, 0, 0, 0)
+    const yesterdayEnd = new Date(yesterday)
+    yesterdayEnd.setDate(yesterdayEnd.getDate() + 1)
+
+    const yesterdayEvent = allEvents.value.find((event: any) => {
+      const d = new Date(event.start)
+      return d >= yesterday && d < yesterdayEnd
+    })
+    if (yesterdayEvent) return "Jetzt geöffnet"
+  }
+
+  const today = new Date(now)
+  today.setHours(0, 0, 0, 0)
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
 
@@ -150,9 +166,14 @@ const todayOpeningInfo = computed(() => {
 
   if (!todayEvent) return "Heute geschlossen"
 
-  const d = new Date(todayEvent.start)
-  const hh = String(d.getHours()).padStart(2, "0")
-  const mm = String(d.getMinutes()).padStart(2, "0")
+  const eventStart = new Date(todayEvent.start)
+
+  // Event hat bereits begonnen → jetzt geöffnet
+  if (now >= eventStart) return "Jetzt geöffnet"
+
+  // Event steht noch bevor → Öffnungszeit anzeigen
+  const hh = String(eventStart.getHours()).padStart(2, "0")
+  const mm = String(eventStart.getMinutes()).padStart(2, "0")
   return `Heute geöffnet ab ${hh}:${mm}`
 })
 

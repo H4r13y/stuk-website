@@ -186,7 +186,14 @@ const {
 })
 
 // Fetch: Events (lazy load on client)
-const nowIso = new Date().toISOString()
+const now = new Date()
+const queryStart = new Date(now)
+// Zwischen 0–3 Uhr: auch Events von gestern einbeziehen (Nachtbetrieb)
+if (now.getHours() < 3) {
+  queryStart.setDate(queryStart.getDate() - 1)
+}
+queryStart.setHours(0, 0, 0, 0)
+const nowIso = queryStart.toISOString()
 const in31DaysIso = new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString()
 
 const eventsUrl =

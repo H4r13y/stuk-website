@@ -39,9 +39,9 @@
               <div class="markdown-content" v-html="ueberUnsHtml"></div>
             </div>
 
-            <div class="ueber-modal-footer">
+            <!-- <div class="ueber-modal-footer">
               <button class="btn primary" @click="showUeberModal = false">Schließen</button>
-            </div>
+            </div> -->
           </div>
         </div>
       </Transition>
@@ -54,7 +54,7 @@
 
       <div v-if="klubratPending" class="loading">Lade Klubrat...</div>
       <div v-else-if="klubratError" class="error">Fehler beim Laden der Klubratsmitglieder</div>
-      <div v-else class="council-grid">
+      <div v-else class="council-grid" lang="de">
         <div v-for="member in klubrats" :key="member.id" class="council-card" @click="openModal(member)">
           <div class="avatar" :style="getAvatarStyle(member)"></div>
           <div class="info">
@@ -113,31 +113,37 @@
   </main>
 
   <!-- Modal for council member details -->
-  <div v-if="selectedMember" class="council-modal active" @click.self="closeModal">
-    <div class="council-modal-content">
-      <button class="close-modal" @click="closeModal">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 6L6 18M6 6l12 12" />
-        </svg>
-      </button>
+  <Teleport to="body">
+    <Transition name="council-sheet">
+      <div v-if="selectedMember" class="council-modal" @click.self="closeModal">
+        <div class="council-modal-content">
+          <div class="council-modal-header">
+            <h3>{{ selectedMember.Posten }}</h3>
+            <button class="close-btn" @click="closeModal">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
 
-      <div class="modal-body">
-        <!-- medium in modal -->
-        <img class="modal-avatar-small" :src="getImageUrl(selectedMember.Profilbild, 'medium')"
-          :alt="selectedMember.Name" />
-        <h2>{{ selectedMember.Name }}</h2>
-        <p class="modal-role">{{ selectedMember.Posten }}</p>
-        <p class="bio">{{ selectedMember.Kurzbeschreibung }}</p>
-        <div class="details">
-          <div v-for="merkmal in selectedMember.KR_Merkmale" :key="merkmal.id" class="detail-item">
-            <strong>{{ merkmal.Titel }}</strong>
-            <span>{{ merkmal.Merkmal }}</span>
+          <div class="modal-body">
+            <img class="modal-avatar-small" :src="getImageUrl(selectedMember.Profilbild, 'medium')"
+              :alt="selectedMember.Name" />
+            <h2>{{ selectedMember.Name }}</h2>
+            <p class="modal-role">{{ selectedMember.Posten }}</p>
+            <p class="bio">{{ selectedMember.Kurzbeschreibung }}</p>
+            <div class="details">
+              <div v-for="merkmal in selectedMember.KR_Merkmale" :key="merkmal.id" class="detail-item">
+                <strong>{{ merkmal.Titel }}</strong>
+                <span>{{ merkmal.Merkmal }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </Transition>
+  </Teleport>
 
   <!-- Gallery Lightbox -->
   <div v-if="galleryActive" class="gallery-lightbox active" @click.self="closeGallery">
@@ -468,6 +474,9 @@ function handleKeydown(e: KeyboardEvent) {
 watch(showUeberModal, (open) => {
   document.body.style.overflow = open ? 'hidden' : ''
 })
+watch(selectedMember, (member) => {
+  document.body.style.overflow = member ? 'hidden' : ''
+})
 
 // --- Mobile Gallery Pagination ---
 const isMobile = ref(false)
@@ -565,6 +574,20 @@ onUnmounted(() => {
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
   }
+
+  .council-card .info {
+    padding: 8px 6px;
+  }
+
+  .council-card h3 {
+    font-size: 0.82rem;
+    hyphens: auto;
+  }
+
+  .council-card .role {
+    font-size: 0.7rem;
+    hyphens: auto;
+  }
 }
 
 .council-card {
@@ -625,69 +648,144 @@ onUnmounted(() => {
   bottom: 0;
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(8px);
-  z-index: 2000;
+  z-index: 2200;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
 }
 
 .council-modal-content {
-  background: linear-gradient(180deg, #111215, #0f1012);
-  border: 1px solid #ffffff14;
+  background: linear-gradient(135deg, #0f1013 0%, #1a1d24 100%);
+  border: 1px solid #ffffff22;
   border-radius: var(--radius);
   max-width: 700px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  animation: slideUp 0.3s ease-out;
 }
 
-@keyframes slideUp {
-  from {
-    transform: translateY(50px);
-    opacity: 0;
+.council-modal-header {
+  display: none;
+}
+
+/* Mobile: Bottom Sheet */
+@media (max-width: 640px) {
+  .council-modal {
+    align-items: flex-end;
+    padding: 0;
   }
 
-  to {
-    transform: translateY(0);
-    opacity: 1;
+  .council-modal-content {
+    border-radius: var(--radius) var(--radius) 0 0;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+  }
+
+  .council-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    border-bottom: 1px solid #ffffff12;
+    background: rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+  }
+
+  .council-modal-header h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 1.15rem;
+  }
+
+  .council-modal-header .close-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-bottom: calc(32px + env(safe-area-inset-bottom, 16px));
   }
 }
 
-.close-modal {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: rgba(10, 11, 13, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  transition: all 0.2s;
+/* Desktop: Close Button */
+@media (min-width: 641px) {
+  .council-modal-header {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    padding: 16px;
+    border: none;
+    background: none;
+  }
+
+  .council-modal-header h3 {
+    display: none;
+  }
+
+  .council-modal-header .close-btn {
+    background: rgba(10, 11, 13, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .council-modal-header .close-btn:hover {
+    background: rgba(188, 43, 37, 0.9);
+    transform: scale(1.1);
+  }
 }
 
-.close-modal:hover {
-  background: rgba(188, 43, 37, 0.9);
-  transform: scale(1.1);
+/* Council Sheet Transition */
+.council-sheet-enter-active,
+.council-sheet-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.council-sheet-enter-from,
+.council-sheet-leave-to {
+  opacity: 0;
+}
+
+.council-sheet-enter-active .council-modal-content,
+.council-sheet-leave-active .council-modal-content {
+  transition: transform 0.25s ease;
+}
+
+@media (max-width: 640px) {
+  .council-sheet-enter-from .council-modal-content,
+  .council-sheet-leave-to .council-modal-content {
+    transform: translateY(100%);
+  }
+}
+
+@media (min-width: 641px) {
+  .council-sheet-enter-from .council-modal-content,
+  .council-sheet-leave-to .council-modal-content {
+    transform: translateY(20px) scale(0.97);
+  }
 }
 
 .modal-body {

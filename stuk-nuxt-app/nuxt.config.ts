@@ -64,6 +64,7 @@ export default defineNuxtConfig({
    */
   app: {
     head: {
+      htmlAttrs: { lang: 'de' },
       title: 'StuK Leipzig – Dein Club in Leipzig',
       meta: [
         { charset: 'utf-8' },
