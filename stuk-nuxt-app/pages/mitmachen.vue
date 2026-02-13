@@ -476,7 +476,7 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .formular {
-  margin: 0px auto 24px auto;
+  margin: 0px 4px 12px 4px;
 }
 
 .hero-image {
@@ -485,7 +485,7 @@ onBeforeUnmount(() => {
   background-size: cover;
   background-position: center;
   border-radius: var(--radius);
-  margin-bottom: 32px;
+  margin-bottom: 0;
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(255,255,255,0.1);
@@ -834,7 +834,7 @@ onBeforeUnmount(() => {
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: var(--radius);
   padding: 40px 32px;
-  margin: 48px 0;
+  margin: 0;
 }
 .stepper-container{
   background:

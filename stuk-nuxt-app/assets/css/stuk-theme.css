@@ -32,6 +32,13 @@ body {
   letter-spacing: .2px
 }
 
+
+@media (max-width: 640px) {
+  body {
+    padding-top: 10px;
+  }
+}
+
 a {
   color: inherit;
   text-decoration: none
@@ -356,6 +363,17 @@ textarea {
   resize: vertical
 }
 
+/* Sticky footer */
+.has-bottom-nav {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.has-bottom-nav main {
+  flex: 1;
+}
+
 /* Footer */
 footer {
   border-top: 1px solid var(--border);
@@ -380,13 +398,6 @@ footer {
   .has-bottom-nav {
     padding-top: 0;
     padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .has-bottom-nav main {
-    flex: 1;
   }
 
   .has-bottom-nav .site-header {

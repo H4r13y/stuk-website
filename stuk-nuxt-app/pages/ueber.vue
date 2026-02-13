@@ -569,6 +569,7 @@ onUnmounted(() => {
   backdrop-filter: blur(14px) saturate(1.2);
   box-shadow: var(--shadow);
   padding: 20px 24px;
+  margin: 8px 4px 0px 4px;
 }
 
 /* Council Grid */
