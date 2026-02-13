@@ -154,21 +154,10 @@
       </svg>
     </button>
 
-    <button class="gallery-nav-btn prev" @click="navigateGallery(-1)">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-        stroke-linecap="round" stroke-linejoin="round">
-        <path d="M15 18l-6-6 6-6" />
-      </svg>
-    </button>
+    <div class="gallery-click-zone gallery-click-left" @click="navigateGallery(-1)"></div>
+    <div class="gallery-click-zone gallery-click-right" @click="navigateGallery(1)"></div>
 
-    <button class="gallery-nav-btn next" @click="navigateGallery(1)">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-        stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 18l6-6-6-6" />
-      </svg>
-    </button>
-
-    <div class="gallery-lightbox-content">
+    <div class="gallery-lightbox-content" @touchstart="onTouchStart" @touchend="onTouchEnd">
       <img class="gallery-lightbox-image" :src="galleryImages[currentGalleryIndex]?.fullSrc"
         :alt="galleryImages[currentGalleryIndex]?.alt" loading="eager" decoding="async" />
       <div v-if="galleryImages[currentGalleryIndex]?.caption" class="gallery-lightbox-caption">
@@ -457,6 +446,25 @@ function navigateGallery(direction: number) {
     const prev = (idx - 1 + galleryImages.value.length) % galleryImages.value.length
     prefetchImage(galleryImages.value[next]?.fullSrc)
     prefetchImage(galleryImages.value[prev]?.fullSrc)
+  }
+}
+
+// Touch/Swipe support for gallery
+let touchStartX = 0
+let touchStartY = 0
+
+function onTouchStart(e: TouchEvent) {
+  touchStartX = e.changedTouches[0].clientX
+  touchStartY = e.changedTouches[0].clientY
+}
+
+function onTouchEnd(e: TouchEvent) {
+  const dx = e.changedTouches[0].clientX - touchStartX
+  const dy = e.changedTouches[0].clientY - touchStartY
+  // Only trigger if horizontal swipe is dominant and > 50px
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+    if (dx < 0) navigateGallery(1)   // swipe left → next
+    else navigateGallery(-1)          // swipe right → prev
   }
 }
 
@@ -994,35 +1002,21 @@ onUnmounted(() => {
   line-height: 1.6;
 }
 
-.gallery-nav-btn {
+.gallery-click-zone {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(10, 11, 13, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  top: 0;
+  bottom: 0;
+  width: 35%;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  z-index: 10;
+  z-index: 5;
 }
 
-.gallery-nav-btn:hover {
-  background: rgba(188, 43, 37, 0.9);
-  transform: translateY(-50%) scale(1.1);
+.gallery-click-left {
+  left: 0;
 }
 
-.gallery-nav-btn.prev {
-  left: 20px;
-}
-
-.gallery-nav-btn.next {
-  right: 20px;
+.gallery-click-right {
+  right: 0;
 }
 
 .gallery-close-btn {
@@ -1049,19 +1043,6 @@ onUnmounted(() => {
 }
 
 @media (max-width: 640px) {
-  .gallery-nav-btn {
-    width: 40px;
-    height: 40px;
-  }
-
-  .gallery-nav-btn.prev {
-    left: 10px;
-  }
-
-  .gallery-nav-btn.next {
-    right: 10px;
-  }
-
   .gallery-close-btn {
     top: 10px;
     right: 10px;
