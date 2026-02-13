@@ -23,7 +23,7 @@
         <div class="benefit-item">
           <div class="icon-large">🍺</div>
           <h4>Vergünstigte Getränke</h4>
-          <p>Mitgliederpreise an der Bar während deiner Schichten</p>
+          <p>Mitgliederpreise an der Bar bei jedem Event!</p>
         </div>
         <div class="benefit-item">
           <div class="icon-large">🤝</div>
@@ -56,7 +56,7 @@
             <div class="step-number">2</div>
             <div class="step-content">
               <div class="step-title">Probedienste</div>
-              <div class="step-desc">Mach zwei Probedienste und schau, ob es dir gefällt</div>
+              <div class="step-desc">Mach Probedienste und schau, ob es dir gefällt</div>
             </div>
           </div>
 
@@ -64,7 +64,7 @@
             <div class="step-number">3</div>
             <div class="step-content">
               <div class="step-title">Anwärter</div>
-              <div class="step-desc">Du bist jetzt Anwärter und Teil des Teams</div>
+              <div class="step-desc">Nach 3 Probediensten und 1 Arbeitseinsatz bist du jetzt Anwärter und Teil des Teams</div>
             </div>
           </div>
 

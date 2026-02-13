@@ -29,7 +29,7 @@
         <article class="panel">
           <!-- <h1>{{ currentMonth }} im StuK</h1> -->
            <h2>Kommende Veranstaltungen im StuK</h2>
-          <p class="sub">Konzerte, Kleinkunst, Quiz & Clubnächte – schnapp dir deine Woche.</p>
+          <p class="sub">Konzerte, Kleinkunst, Quiz, Clubnächte und mehr.</p>
           <div class="badge"><span class="dot"></span> {{ todayOpeningInfo }}</div>
 
           <div style="margin-top:14px; display:flex; gap:12px; flex-wrap:wrap">
@@ -379,8 +379,7 @@ useHead({
 .hero-text p {
   font-size: 1.5rem;
   margin: 16px 0 0;
-  font-weight: 300;
-  opacity: 0.95
+  font-weight: 1000;
 }
 
 .scroll-indicator {
