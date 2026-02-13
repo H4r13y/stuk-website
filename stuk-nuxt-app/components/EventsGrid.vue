@@ -557,7 +557,8 @@ function formatEventTime(event: Event) {
   border: 1px solid var(--border);
   color: #cfd3d9;
   border-radius: 999px;
-  cursor: pointer
+  cursor: pointer;
+  margin: 0 2px 0 2px;
 }
 
 .chip[data-active="true"] {
