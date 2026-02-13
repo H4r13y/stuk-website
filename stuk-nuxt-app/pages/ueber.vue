@@ -154,6 +154,20 @@
       </svg>
     </button>
 
+    <button class="gallery-nav-btn prev" @click="navigateGallery(-1)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 18l-6-6 6-6" />
+      </svg>
+    </button>
+
+    <button class="gallery-nav-btn next" @click="navigateGallery(1)">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18l6-6-6-6" />
+      </svg>
+    </button>
+
     <div class="gallery-click-zone gallery-click-left" @click="navigateGallery(-1)"></div>
     <div class="gallery-click-zone gallery-click-right" @click="navigateGallery(1)"></div>
 
@@ -1002,6 +1016,38 @@ onUnmounted(() => {
   line-height: 1.6;
 }
 
+.gallery-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(10, 11, 13, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.gallery-nav-btn:hover {
+  background: rgba(188, 43, 37, 0.9);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.gallery-nav-btn.prev {
+  left: 20px;
+}
+
+.gallery-nav-btn.next {
+  right: 20px;
+}
+
+/* Invisible click zones – only visible on mobile (no arrows there) */
 .gallery-click-zone {
   position: absolute;
   top: 0;
@@ -1009,6 +1055,7 @@ onUnmounted(() => {
   width: 35%;
   cursor: pointer;
   z-index: 5;
+  display: none;
 }
 
 .gallery-click-left {
@@ -1043,6 +1090,14 @@ onUnmounted(() => {
 }
 
 @media (max-width: 640px) {
+  .gallery-nav-btn {
+    display: none;
+  }
+
+  .gallery-click-zone {
+    display: block;
+  }
+
   .gallery-close-btn {
     top: 10px;
     right: 10px;
