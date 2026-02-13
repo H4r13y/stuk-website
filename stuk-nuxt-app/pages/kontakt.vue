@@ -74,7 +74,21 @@
       </div>
     </section>
 
-    <!-- Forms -->
+    <!-- Forms (Bottom Sheet on Mobile) -->
+    <Transition name="form-sheet">
+      <div v-if="activeForm" class="form-sheet-overlay">
+        <div class="form-sheet-content">
+          <div class="form-sheet-titlebar">
+            <h3>{{ formTitle }}</h3>
+            <button class="close-btn" @click="showOptions">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+          <div class="form-sheet-scroll">
+
     <section v-if="activeForm === 'general'" class="container contact-form">
       <button class="btn ghost back-btn" @click="showOptions">← Zurück zur Übersicht</button>
       <article class="panel">
@@ -241,6 +255,11 @@
       </article>
     </section>
 
+          </div>
+        </div>
+      </div>
+    </Transition>
+
     <section class="container address-section">
       <h2>Adresse & Öffnungszeiten</h2>
       <div class="panel address-grid">
@@ -288,7 +307,7 @@
 
 <script setup lang="ts">
 // Für die Ziel-Mails und die Texte: stuk-website\strapi-website\src\api\kontakt\controllers\kontakt.ts
-import { ref } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 
 useHead({
   title: 'StuK – Kontakt',
@@ -408,6 +427,37 @@ const showOptions = () => {
   resetTurnstile()
 }
 
+const formTitle = computed(() => {
+  const titles: Record<string, string> = {
+    general: 'Allgemeine Anfrage',
+    booking: 'Buchungsanfrage',
+    lost: 'Fundsachen',
+    board: 'Vorstand kontaktieren',
+    join: 'Mitmachen',
+    awareness: 'Awareness'
+  }
+  return activeForm.value ? titles[activeForm.value] || '' : ''
+})
+
+// Body scroll lock on mobile + Escape key
+watch(activeForm, (form) => {
+  if (typeof window !== 'undefined' && window.innerWidth <= 640) {
+    document.body.style.overflow = form ? 'hidden' : ''
+  }
+})
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape' && activeForm.value) showOptions()
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', onKeydown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', onKeydown)
+  document.body.style.overflow = ''
+})
 
 const submitForm = async (formType: string) => {
   isSubmitting.value = true
@@ -611,20 +661,6 @@ const submitForm = async (formType: string) => {
   margin: 0;
 }
 
-.contact-form {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
 .back-btn {
   margin-bottom: 20px;
@@ -645,6 +681,106 @@ const submitForm = async (formType: string) => {
   .address-grid > div {
     width: 100%;
     min-width: 0;
+  }
+}
+
+/* Form Sheet – Desktop: inline, Mobile: bottom sheet */
+.form-sheet-titlebar {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .form-sheet-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 2200;
+    display: flex;
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .form-sheet-content {
+    background: linear-gradient(135deg, #0f1013 0%, #1a1d24 100%);
+    border-radius: var(--radius) var(--radius) 0 0;
+    max-height: 85vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.6);
+  }
+
+  .form-sheet-titlebar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    border-bottom: 1px solid #ffffff12;
+    background: rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+  }
+
+  .form-sheet-titlebar h3 {
+    margin: 0;
+    color: var(--text);
+    font-size: 1.15rem;
+  }
+
+  .form-sheet-titlebar .close-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .form-sheet-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 16px));
+  }
+
+  .back-btn {
+    display: none !important;
+  }
+}
+
+/* Form Sheet Transition */
+.form-sheet-enter-active,
+.form-sheet-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.form-sheet-enter-from,
+.form-sheet-leave-to {
+  opacity: 0;
+}
+
+.form-sheet-enter-active .form-sheet-content,
+.form-sheet-leave-active .form-sheet-content {
+  transition: transform 0.25s ease;
+}
+
+@media (max-width: 640px) {
+  .form-sheet-enter-from .form-sheet-content,
+  .form-sheet-leave-to .form-sheet-content {
+    transform: translateY(100%);
+  }
+}
+
+@media (min-width: 641px) {
+  .form-sheet-enter-from .form-sheet-content,
+  .form-sheet-leave-to .form-sheet-content {
+    transform: translateY(20px) scale(0.97);
   }
 }
 
