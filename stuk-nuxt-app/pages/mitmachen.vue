@@ -476,7 +476,13 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .formular {
-  margin: 0px 4px 12px 4px;
+  margin: 0px auto 12px auto;
+}
+
+@media (max-width: 640px) {
+  .formular {
+    margin: 8px 4px 0px 4px;
+  }
 }
 
 .hero-image {
