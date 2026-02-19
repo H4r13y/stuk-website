@@ -558,6 +558,7 @@ onUnmounted(() => {
   window.removeEventListener('scroll', checkTimelineItems)
   window.removeEventListener('resize', checkTimelineItems)
   window.removeEventListener('keydown', handleKeydown)
+  document.body.style.overflow = ''
 })
 </script>
 

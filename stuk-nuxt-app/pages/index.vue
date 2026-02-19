@@ -99,6 +99,14 @@ function stopSlider() {
 onMounted(() => {
   // Start nach Mount (Client)
   startSlider()
+
+  // Maps URL basierend auf Device aktualisieren (nach Hydration)
+  const userAgent = navigator.userAgent || ''
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream
+  const isMacOS = /Macintosh|MacIntel|MacPPC|Mac68K/.test(userAgent)
+  if (isIOS || isMacOS) {
+    mapsUrl.value = appleMapsUrl
+  }
 })
 
 // Falls Bilder z.B. beim Dev-HMR neu geladen werden: Slider neu starten
@@ -178,28 +186,11 @@ const todayOpeningInfo = computed(() => {
 })
 
 // Dynamische Maps URL basierend auf Device und OS
-const mapsUrl = computed(() => {
-  // Server-side: Google Maps als Fallback
-  if (typeof navigator === 'undefined') {
-    return 'https://maps.app.goo.gl/H2w1sCkS5DC5bTx37?g_st=ic'
-  }
+const googleMapsUrl = 'https://maps.app.goo.gl/H2w1sCkS5DC5bTx37?g_st=ic'
+const appleMapsUrl = 'https://maps.apple.com/place?q=StuK+Leipzig&ll=51.3396,12.3731&address=Kochstra%C3%9Fe+132,+04277+Leipzig'
 
-  const userAgent = navigator.userAgent || ''
-
-  // iOS Detection (iPhone, iPad, iPod)
-  const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream
-
-  // macOS Detection
-  const isMacOS = /Macintosh|MacIntel|MacPPC|Mac68K/.test(userAgent)
-
-  // Wenn iOS oder macOS: Apple Maps
-  if (isIOS || isMacOS) {
-    return 'https://maps.apple.com/place?q=StuK+Leipzig&ll=51.3396,12.3731&address=Kochstra%C3%9Fe+132,+04277+Leipzig'
-  }
-
-  // Alle anderen: Google Maps
-  return 'https://maps.app.goo.gl/H2w1sCkS5DC5bTx37?g_st=ic'
-})
+// Starte mit Google Maps (gleich wie Server), Update nach Hydration
+const mapsUrl = ref(googleMapsUrl)
 
 // Helper functions for formatting (used by specialEvents)
 function formatDate(dateString: string) {
