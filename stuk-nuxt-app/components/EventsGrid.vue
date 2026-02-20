@@ -154,18 +154,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue"
-
-type StrapiList<T> = { data: T[] }
-
-type Label = { id: number; name: string; description?: string | null }
-type Event = {
-  id: number
-  title: string
-  description?: string | null
-  start: string
-  special_event?: boolean | null
-  labels?: Label[] | null
-}
+import type { StrapiList, Label, Event } from "~/types"
 
 const config = useRuntimeConfig()
 const strapiUrl = config.public.strapiUrl

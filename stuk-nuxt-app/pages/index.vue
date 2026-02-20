@@ -60,6 +60,7 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted, onBeforeUnmount, watch } from "vue"
+import type { Event } from "~/types"
 
 // Alle Bilder aus assets/images/hero-slider automatisch einsammeln (egal wie benannt)
 const sliderFiles = import.meta.glob(
@@ -120,10 +121,10 @@ onBeforeUnmount(() => {
 })
 
 // Ref zur EventsGrid Component, um auf Events zuzugreifen
-const eventsGridRef = ref<{ allEvents: any } | null>(null)
+const eventsGridRef = ref<{ allEvents: Event[] } | null>(null)
 
 // Events von der EventsGrid Component
-const allEvents = computed(() => eventsGridRef.value?.allEvents ?? [])
+const allEvents = computed((): Event[] => eventsGridRef.value?.allEvents ?? [])
 
 const specialEvents = computed(() => {
   return allEvents.value
@@ -155,7 +156,7 @@ const todayOpeningInfo = computed(() => {
     const yesterdayEnd = new Date(yesterday)
     yesterdayEnd.setDate(yesterdayEnd.getDate() + 1)
 
-    const yesterdayEvent = allEvents.value.find((event: any) => {
+    const yesterdayEvent = allEvents.value.find((event) => {
       const d = new Date(event.start)
       return d >= yesterday && d < yesterdayEnd
     })
@@ -167,7 +168,7 @@ const todayOpeningInfo = computed(() => {
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
 
-  const todayEvent = allEvents.value.find((event: any) => {
+  const todayEvent = allEvents.value.find((event) => {
     const d = new Date(event.start)
     return d >= today && d < tomorrow
   })

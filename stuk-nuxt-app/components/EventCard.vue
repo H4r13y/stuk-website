@@ -24,16 +24,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue"
-
-type Label = { id: number; name: string; description?: string | null }
-type Event = {
-  id: number
-  title: string
-  description?: string | null
-  start: string
-  special_event?: boolean | null
-  labels?: Label[] | null
-}
+import type { Event } from "~/types"
 
 const props = defineProps<{
   event: Event
