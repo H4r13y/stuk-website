@@ -270,7 +270,7 @@
         </div>
         <div>
           <h3>Öffnungszeiten</h3>
-          <p>Abendbetrieb zu Eventzeiten<br>Infos siehe <NuxtLink to="/" style="color:var(--brand-red)">Programm</NuxtLink></p>
+          <p>Dienstag, Donnerstag, Freitag<br>Mehr Infos unter <NuxtLink to="/" style="color:var(--brand-red)">Programm</NuxtLink></p>
         </div>
       </div>
     </section>

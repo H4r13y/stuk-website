@@ -120,16 +120,14 @@
         </div>
 
         <div class="input" style="grid-column:1/-1">
-          <label>Bereich</label>
-          <select v-model="formData.bereich" required>
-            <option value="">Bitte wählen...</option>
-            <option>Bar</option>
-            <option>Einlass</option>
-            <option>Technik</option>
-            <option>Booking</option>
-            <option>Design</option>
-            <option>Orga</option>
-          </select>
+          <label>Bereich(e)</label>
+          <div class="checkbox-group">
+            <label v-for="option in bereichOptions" :key="option" class="checkbox-label">
+              <input type="checkbox" :value="option" v-model="formData.bereiche">
+              <span class="checkbox-box"></span>
+              <span>{{ option }}</span>
+            </label>
+          </div>
         </div>
 
         <div style="grid-column:1/-1">
@@ -240,11 +238,12 @@ const strapiUrl = config.public.strapiUrl
 const emailToken = config.public.emailStrapiToken
 
 // Form data
+const bereichOptions = ['Bar', 'Einlass', 'Technik', 'Booking', 'Design', 'Orga', 'Weiß ich nicht']
 const formData = ref({
   name: '',
   email: '',
   phone: '',
-  bereich: ''
+  bereiche: [] as string[]
 })
 
 // Turnstile
@@ -427,7 +426,7 @@ async function submitForm() {
           name: formData.value.name,
           email: formData.value.email,
           phone: formData.value.phone,
-          area: formData.value.bereich,
+          area: formData.value.bereiche.join(', '),
         },
         turnstileToken: turnstileToken.value,
       },
@@ -436,7 +435,7 @@ async function submitForm() {
     if (response && (response as any).success) {
       showSuccessNotification('Bewerbung erhalten!', 'Danke für dein Interesse! Wir melden uns zeitnah bei dir.')
 
-      formData.value = { name: '', email: '', phone: '', bereich: '' }
+      formData.value = { name: '', email: '', phone: '', bereiche: [] }
 
       // Wichtig: Turnstile danach hart resetten
       resetTurnstile()
@@ -475,6 +474,64 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+/* Checkbox Group */
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  color: var(--muted);
+  user-select: none;
+}
+.checkbox-label:hover {
+  border-color: rgba(188,43,37,0.4);
+  background: rgba(188,43,37,0.06);
+}
+.checkbox-label:has(input:checked) {
+  border-color: rgba(188,43,37,0.6);
+  background: rgba(188,43,37,0.12);
+  color: var(--text);
+}
+.checkbox-label input {
+  display: none;
+}
+.checkbox-box {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 2px solid rgba(255,255,255,0.2);
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.checkbox-label:has(input:checked) .checkbox-box {
+  background: var(--brand-red);
+  border-color: var(--brand-red);
+}
+.checkbox-label:has(input:checked) .checkbox-box::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
 .formular {
   margin: 0px auto 12px auto;
 }
@@ -923,12 +980,33 @@ onBeforeUnmount(() => {
   line-height: 1.5;
 }
 @media (max-width: 768px) {
+  .stepper-container {
+    padding: 32px 0;
+    overflow: hidden;
+  }
+  .stepper-container h2,
+  .stepper-container .sub {
+    padding: 0 24px;
+  }
   .stepper {
-    flex-direction: column;
-    gap: 32px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 0;
+    margin-top: 24px;
+    padding: 0 calc(50% - 120px);
+  }
+  .stepper::-webkit-scrollbar {
+    display: none;
   }
   .stepper::before {
     display: none;
+  }
+  .step {
+    flex: 0 0 240px;
+    scroll-snap-align: center;
+    padding: 0 12px;
   }
   .step-content {
     max-width: 100%;

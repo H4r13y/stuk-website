@@ -22,24 +22,23 @@
     </main>
 
     <footer>
-      <div class="container meta-grid">
-        <div>
-          <strong>StuK Leipzig</strong>
-          <p class="sub">Party mit Prinzipien - Kein Platz für Hass, Intoleranzen und Diskriminierung.</p>
-        </div>
-        <div>
-          <strong>Kontakt</strong>
-          <p class="sub">
-            info@stuk-leipzig.de<br>
-            Nürnberger Straße 42, 04103 Leipzig
-          </p>
-        </div>
-        <div>
-          <strong>Rechtliches</strong>
-          <p class="sub">
-            <NuxtLink to="/impressum">Impressum</NuxtLink> ·
-            <NuxtLink to="/datenschutz">Datenschutz</NuxtLink>
-          </p>
+      <div class="container">
+        <strong class="footer-title">StuK Leipzig</strong>
+        <div class="meta-grid">
+          <div>
+            <strong>Kontakt</strong>
+            <p class="sub">
+              info@stuk-leipzig.de<br>
+              Nürnberger Straße 42, 04103 Leipzig
+            </p>
+          </div>
+          <div>
+            <strong>Rechtliches</strong>
+            <p class="sub">
+              <NuxtLink to="/impressum">Impressum</NuxtLink><br>
+              <NuxtLink to="/datenschutz">Datenschutz</NuxtLink>
+            </p>
+          </div>
         </div>
       </div>
     </footer>

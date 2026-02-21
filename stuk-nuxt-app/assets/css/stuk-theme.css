@@ -377,20 +377,28 @@ textarea {
 /* Footer */
 footer {
   border-top: 1px solid var(--border);
-  padding: 40px 0;
+  padding: 16px 0;
   background: linear-gradient(180deg, #0b0c0e, #090a0b)
+}
+
+footer strong {
+  font-size: .85rem;
+}
+
+.footer-title {
+  display: block;
+  margin-bottom: 8px;
 }
 
 .meta-grid {
   display: grid;
-  gap: 18px;
-  grid-template-columns: 2fr 1fr 1fr
+  gap: 10px;
+  grid-template-columns: 1fr 1fr
 }
 
-@media (max-width: 820px) {
-  .meta-grid {
-    grid-template-columns: 1fr
-  }
+.meta-grid .sub {
+  margin: 4px 0 0;
+  font-size: .8rem;
 }
 
 /* Mobile: move nav to bottom when opted in */

@@ -2,14 +2,14 @@
   <main>
     <section class="pfand-hero">
       <div class="pfand-content">
-        <div class="pfand-icon">🤭</div>
-        <h1>Hupps, du hast ne Pfandmarke geklaut!</h1>
+        <!-- <div class="pfand-icon">🤭</div> -->
+        <h1>Oh, du hast ne Pfandmarke geklaut!</h1>
 
-        <p class="message" style="font-size: 1.5rem; margin-bottom: 48px;">
+        <p class="message">
           Jetzt wo du etwas von uns hast, dann werde doch gleich Teil der StuK-Familie 🎉
         </p>
 
-        <h2 style="color: var(--brand-red); margin-bottom: 24px; font-size: 1.8rem;">Warum dem StuK beitreten?</h2>
+        <h2 style="color: var(--brand-red); margin-bottom: 16px;">Warum dem StuK beitreten?</h2>
 
         <div class="pfand-facts">
           <div class="pfand-fact">
@@ -26,16 +26,7 @@
           </div>
         </div>
 
-        <div class="serious">
-          <p style="margin-bottom: 16px;"><strong>Mitgliedschafts-Vorteile:</strong></p>
-          <ul style="list-style: none; padding: 0; margin: 0;">
-            <li style="padding: 8px 0; color: var(--text);">✓ Tolle Vereinsaktivitäten (Partys, Ausflüge, etc.)</li>
-            <li style="padding: 8px 0; color: var(--text);">✓ Einblick in die Leipziger Studentenclubszene</li>
-            <li style="padding: 8px 0; color: var(--text);">✓ Tolle Erinnerungen (Wenn man's schafft)</li>
-          </ul>
-        </div>
-
-        <h3 style="color: var(--text); margin: 48px 0 24px; font-size: 1.5rem;">Interesse? Schreibt uns hier:</h3>
+        <h3 style="color: var(--text); margin: 32px 0 16px;">Interesse? Schreibt uns hier:</h3>
 
         <form class="form" style="text-align: left;" @submit.prevent="submitForm">
           <div class="input">
@@ -239,16 +230,16 @@ async function submitForm() {
 }
 .pfand-content h1 {
   color: var(--brand-red);
-  font-size: 2.5rem;
-  margin-bottom: 16px;
+  font-size: 1.6rem;
+  margin-bottom: 12px;
   text-transform: uppercase;
   letter-spacing: 2px;
 }
 .pfand-content .message {
   color: var(--text);
-  font-size: 1.2rem;
-  line-height: 1.8;
-  margin-bottom: 32px;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 24px;
 }
 .pfand-content .serious {
   background: rgba(188,43,37,0.2);
@@ -265,15 +256,16 @@ async function submitForm() {
 .pfand-facts {
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  margin: 32px 0;
-  text-align: left;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 24px 0;
+  text-align: center;
 }
 .pfand-fact {
   background: rgba(255,255,255,0.05);
   padding: 20px;
   border-radius: var(--radius);
   border: 1px solid rgba(255,255,255,0.1);
+  text-align: center;
 }
 .pfand-fact .number {
   font-size: 2rem;
@@ -287,10 +279,14 @@ async function submitForm() {
 }
 @media (max-width: 640px) {
   .pfand-content h1 {
-    font-size: 1.8rem;
+    font-size: 1.3rem;
   }
   .pfand-content .message {
-    font-size: 1rem;
+    font-size: 0.9rem;
+  }
+  .pfand-facts {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
   .pfand-icon {
     font-size: 3rem;

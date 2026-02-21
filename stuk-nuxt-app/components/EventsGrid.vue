@@ -86,31 +86,42 @@
       </Transition>
     </Teleport>
 
-    <div class="events" aria-live="polite">
-      <p v-if="eventsPending" style="color: var(--muted); grid-column: 1/-1; text-align: center;">
+    <div aria-live="polite">
+      <p v-if="eventsPending" style="color: var(--muted); text-align: center;">
         Lade Events…
       </p>
 
-      <p v-else-if="eventsError" style="color: var(--error); grid-column: 1/-1; text-align: center;">
+      <p v-else-if="eventsError" style="color: var(--error); text-align: center;">
         Events konnten nicht geladen werden. Bitte später nochmal versuchen.
       </p>
 
       <template v-else>
-        <EventCard
-          v-for="(event, index) in filteredEvents"
-          :key="event.id"
-          :event="event"
-          :variant="index % 4"
-          @click="handleEventClick"
-        />
-
         <p
-          v-if="filteredEvents.length === 0"
-          style="color: var(--muted); grid-column: 1/-1; text-align: center;"
+          v-if="weekGroups.length === 0"
+          style="color: var(--muted); text-align: center;"
         >
           Keine Events gefunden. Bitte später noch einmal schauen!
         </p>
+
+        <div v-for="week in weekGroups" :key="week.label" class="week-group">
+          <h3 class="week-header">{{ week.label }}</h3>
+          <div class="events">
+            <EventCard
+              v-for="(event, index) in week.events"
+              :key="event.id"
+              :event="event"
+              :variant="index % 4"
+              @click="handleEventClick"
+            />
+          </div>
+        </div>
       </template>
+    </div>
+
+    <div v-if="!showAll && hiddenCount > 0" class="load-more-wrap">
+      <button class="btn load-more" @click="showAll = true">
+        Mehr Veranstaltungen laden ({{ hiddenCount }})
+      </button>
     </div>
 
     <!-- Event Details Modal (nur Mobile) -->
@@ -163,6 +174,7 @@ const strapiUrl = config.public.strapiUrl
 const activeFilters = ref<string[]>([])
 const showFilterModal = ref(false)
 const selectedEvent = ref<Event | null>(null)
+const showAll = ref(false)
 
 // Fetch: Labels (lazy load on client)
 const {
@@ -218,6 +230,65 @@ const filteredEvents = computed(() => {
     const labels = event.labels ?? []
     return labels.some((l) => activeFilters.value.includes(l.name))
   })
+})
+
+const twoWeeksFromNow = computed(() => {
+  const d = new Date()
+  d.setDate(d.getDate() + 14)
+  d.setHours(23, 59, 59, 999)
+  return d
+})
+
+const visibleEvents = computed(() => {
+  if (showAll.value) return filteredEvents.value
+  return filteredEvents.value.filter((e: Event) => new Date(e.start) <= twoWeeksFromNow.value)
+})
+
+const hiddenCount = computed(() => filteredEvents.value.length - visibleEvents.value.length)
+
+// Events nach Kalenderwoche (Mo–So) gruppieren
+interface WeekGroup {
+  label: string
+  events: Event[]
+}
+
+function getMonday(d: Date): Date {
+  const date = new Date(d)
+  const day = date.getDay()
+  const diff = day === 0 ? -6 : 1 - day // Montag = Wochenanfang
+  date.setDate(date.getDate() + diff)
+  date.setHours(0, 0, 0, 0)
+  return date
+}
+
+function formatDayMonth(d: Date): string {
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  return `${day}.${month}.`
+}
+
+const weekGroups = computed((): WeekGroup[] => {
+  const groups: Map<number, { monday: Date; events: Event[] }> = new Map()
+
+  for (const event of visibleEvents.value) {
+    const monday = getMonday(new Date(event.start))
+    const key = monday.getTime()
+    if (!groups.has(key)) {
+      groups.set(key, { monday, events: [] })
+    }
+    groups.get(key)!.events.push(event)
+  }
+
+  return Array.from(groups.values())
+    .sort((a, b) => a.monday.getTime() - b.monday.getTime())
+    .map(({ monday, events }) => {
+      const sunday = new Date(monday)
+      sunday.setDate(sunday.getDate() + 6)
+      return {
+        label: `${formatDayMonth(monday)} bis ${formatDayMonth(sunday)}`,
+        events,
+      }
+    })
 })
 
 // Expose allEvents for parent to use
@@ -693,5 +764,34 @@ function formatEventTime(event: Event) {
   color: #fff;
   font-size: 0.85rem;
   font-weight: 500;
+}
+
+/* Week Groups */
+.week-group {
+  margin-bottom: 32px;
+}
+
+.week-header {
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin: 0 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Load More Button */
+.load-more-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 24px 0 12px;
+}
+
+.load-more {
+  padding: 8px 18px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
 }
 </style>

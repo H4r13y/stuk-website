@@ -63,7 +63,7 @@
       <div v-if="klubratPending" class="loading">Lade Klubrat...</div>
       <div v-else-if="klubratError" class="error">Fehler beim Laden der Klubratsmitglieder</div>
       <div v-else class="council-grid" lang="de">
-        <div v-for="member in klubrats" :key="member.id" class="council-card" @click="openModal(member)">
+        <div v-for="member in klubrats" :key="member.id" class="council-card" :class="{ 'council-card--spitze': member.Dreierspitze }" @click="openModal(member)">
           <div class="avatar" :style="getAvatarStyle(member)"></div>
           <div class="info">
             <h3>{{ member.Name }}</h3>
@@ -74,7 +74,7 @@
     </section>
 
     <section class="container">
-      <h2>Zu uns gehört noch viel mehr</h2>
+      <h2>Zu uns gehören noch viel mehr</h2>
       <p class="sub" style="margin-bottom:24px">Über 50 aktive Mitglieder gestalten den StuK – an der Bar, am Einlass,
         in der Technik und überall dazwischen</p>
 
@@ -86,17 +86,28 @@
 
       <div v-if="collagePending" class="loading">Lade Galerie...</div>
       <div v-else-if="collageError" class="error">Fehler beim Laden der Galerie</div>
-      <div v-else class="member-collage">
-        <div v-for="(image, index) in visibleGalleryImages" :key="index" class="collage-item"
+
+      <!-- Desktop: Collage Grid -->
+      <div v-else class="member-collage desktop-only">
+        <div v-for="(image, index) in galleryImages" :key="index" class="collage-item"
           :class="getCollageItemClass(index)" :style="{ backgroundImage: `url('${image.previewSrc}')` }"
           :title="image.caption" @click="openGallery(index)"></div>
       </div>
 
-      <!-- Mobile: Load more -->
-      <div v-if="canLoadMoreGallery" class="gallery-loadmore">
-        <button class="read-more-btn" @click="loadMoreGallery">
-          Mehr Bilder laden ({{ Math.min(mobileVisibleCount + 10, galleryImages.length) }}/{{ galleryImages.length }})
-        </button>
+      <!-- Mobile: Instagram-Style Carousel -->
+      <div v-if="!collagePending && !collageError && galleryImages.length" class="mobile-only">
+        <div class="carousel" ref="carouselRef" @scroll.passive="onCarouselScroll">
+          <div v-for="(image, index) in galleryImages" :key="index" class="carousel__slide">
+            <img :src="image.previewSrc" :alt="image.alt" class="carousel__image" @click="openGallery(index)" />
+          </div>
+        </div>
+
+        <div class="carousel__dots">
+          <span v-for="(_, index) in galleryImages" :key="index" class="carousel__dot"
+            :class="{ active: index === carouselIndex }" @click="goToSlide(index)"></span>
+        </div>
+
+        <div class="carousel__counter">{{ carouselIndex + 1 }} / {{ galleryImages.length }}</div>
       </div>
     </section>
 
@@ -219,6 +230,7 @@ type Klubrat = {
   Name: string
   Posten: string
   Kurzbeschreibung: string
+  Dreierspitze: boolean
   Profilbild: StrapiMedia | null
   KR_Merkmale: KRMerkmal[]
 }
@@ -250,7 +262,16 @@ const { data: klubratsRes, pending: klubratPending, error: klubratError } = awai
   }
 )
 
-const klubrats = computed(() => klubratsRes.value?.data || [])
+const klubrats = computed(() => {
+  const all = klubratsRes.value?.data || []
+  return all.slice().sort((a: Klubrat, b: Klubrat) => {
+    // Dreierspitze always first
+    if (a.Dreierspitze && !b.Dreierspitze) return -1
+    if (!a.Dreierspitze && b.Dreierspitze) return 1
+    // Then alphabetically by Posten
+    return a.Posten.localeCompare(b.Posten, 'de')
+  })
+})
 const klubratCount = computed(() => klubrats.value.length)
 
 // Über-Collage
@@ -508,41 +529,111 @@ watch(selectedMember, (member) => {
   document.body.style.overflow = member ? 'hidden' : ''
 })
 
-// --- Mobile Gallery Pagination ---
+// --- Mobile Detection ---
 const isMobile = ref(false)
 
 function updateIsMobile() {
   isMobile.value = window.innerWidth <= 640
 }
 
-const mobileBatchSize = 10
-const mobileVisibleCount = ref(mobileBatchSize)
+// --- Mobile Carousel ---
+const carouselDragging = ref(false)
+const carouselDragOffset = ref(0)
+let carouselTouchStartX = 0
+let carouselTouchStartY = 0
+let carouselTouchStartTime = 0
+let carouselDirection: 'horizontal' | 'vertical' | null = null
 
-const visibleGalleryImages = computed(() => {
-  // Desktop: alles zeigen
-  if (!isMobile.value) return galleryImages.value
-  // Mobile: nur Teil zeigen
-  return galleryImages.value.slice(0, mobileVisibleCount.value)
-})
-
-const canLoadMoreGallery = computed(() => {
-  return isMobile.value && mobileVisibleCount.value < galleryImages.value.length
-})
-
-function loadMoreGallery() {
-  mobileVisibleCount.value = Math.min(
-    mobileVisibleCount.value + mobileBatchSize,
-    galleryImages.value.length
-  )
+function onCarouselTouchStart(e: TouchEvent) {
+  carouselTouchStartX = e.touches[0].clientX
+  carouselTouchStartY = e.touches[0].clientY
+  carouselTouchStartTime = Date.now()
+  carouselDragging.value = true
+  carouselDragOffset.value = 0
+  carouselDirection = null
 }
 
-// Wenn neue Bilder kommen (Fetch), wieder auf initial setzen
-watch(
-  () => galleryImages.value.length,
-  () => {
-    mobileVisibleCount.value = mobileBatchSize
+function onCarouselTouchMove(e: TouchEvent) {
+  if (!carouselDragging.value) return
+  const dx = e.touches[0].clientX - carouselTouchStartX
+  const dy = e.touches[0].clientY - carouselTouchStartY
+
+  // Lock direction once on first significant movement
+  if (carouselDirection === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+    carouselDirection = Math.abs(dx) >= Math.abs(dy) ? 'horizontal' : 'vertical'
   }
-)
+
+  if (carouselDirection === 'horizontal') {
+    e.preventDefault()
+    carouselDragOffset.value = dx
+  }
+}
+
+const carouselEl = ref<HTMLElement | null>(null)
+
+function onCarouselTouchEnd() {
+  if (!carouselDragging.value) return
+  carouselDragging.value = false
+
+  const dx = carouselDragOffset.value
+  const elapsed = Date.now() - carouselTouchStartTime
+  const velocity = Math.abs(dx) / Math.max(elapsed, 1)
+
+  const width = carouselEl.value?.clientWidth ?? window.innerWidth
+  const minSwipe = width * 0.22 // ~22% der Breite (fühlt sich i.d.R. gut an)
+
+  const shouldMove =
+    carouselDirection === 'horizontal' &&
+    (Math.abs(dx) > minSwipe || (Math.abs(dx) > 10 && velocity > 0.6))
+
+  if (shouldMove) {
+    if (dx < 0 && carouselIndex.value < galleryImages.value.length - 1) carouselIndex.value++
+    else if (dx > 0 && carouselIndex.value > 0) carouselIndex.value--
+  }
+
+  // IMMER sauber zurücksetzen
+  carouselDragOffset.value = 0
+  carouselDirection = null
+}
+
+// Falls die Bilder (async) reinkommen und der Index out-of-range wäre:
+watch(galleryImages, (imgs) => {
+  if (carouselIndex.value > imgs.length - 1) carouselIndex.value = Math.max(imgs.length - 1, 0)
+})
+
+// Bei Resize auch Offset killen (verhindert “halbe” Positionen nach Rotation)
+watch(isMobile, () => {
+  carouselDragOffset.value = 0
+  carouselDragging.value = false
+  carouselDirection = null
+})
+
+const carouselRef = ref<HTMLElement | null>(null)
+const carouselIndex = ref(0)
+
+let raf = 0
+function onCarouselScroll() {
+  const el = carouselRef.value
+  if (!el) return
+  cancelAnimationFrame(raf)
+  raf = requestAnimationFrame(() => {
+    const w = el.clientWidth || 1
+    const idx = Math.round(el.scrollLeft / w)
+    carouselIndex.value = Math.min(Math.max(idx, 0), galleryImages.value.length - 1)
+  })
+}
+
+function goToSlide(index: number) {
+  const el = carouselRef.value
+  if (!el) return
+  const w = el.clientWidth
+  carouselIndex.value = index
+  el.scrollTo({ left: index * w, behavior: 'smooth' })
+}
+
+watch(galleryImages, (imgs) => {
+  if (carouselIndex.value > imgs.length - 1) carouselIndex.value = Math.max(imgs.length - 1, 0)
+})
 
 
 onMounted(() => {
@@ -717,6 +808,19 @@ onUnmounted(() => {
   transform: translateY(-6px);
   border-color: rgba(188, 43, 37, 0.4);
   box-shadow: 0 12px 32px rgba(188, 43, 37, 0.2);
+}
+
+.council-card--spitze {
+  border-color: rgba(188, 43, 37, 0.35);
+  box-shadow: 0 4px 20px rgba(188, 43, 37, 0.15);
+}
+
+.council-card--spitze .avatar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-bottom: 2px solid rgba(188, 43, 37, 0.5);
 }
 
 .council-card .avatar {
@@ -1028,33 +1132,80 @@ onUnmounted(() => {
 }
 
 @media (max-width: 640px) {
-  .member-collage {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    /* 4 pro Reihe */
-    gap: 6px;
-  }
-
-  .collage-item {
-    height: 90px;
-    /* kleiner -> mehr sichtbar */
-    border-radius: 10px;
-    /* optional etwas kleiner */
-  }
-}
-
-@media (max-width: 640px) {
-  .collage-item.wide {
-    grid-column: span 1;
-  }
-
-  .collage-item.tall {
-    grid-row: span 1;
-    height: 200px;
-  }
-
   .assembly-photo {
     height: 300px;
   }
+}
+
+/* Mobile Carousel (Instagram-Style) */
+.carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  border-radius: var(--radius);
+  touch-action: auto;
+  scrollbar-width: none;
+  overflow-y: hidden;
+}
+.carousel::-webkit-scrollbar { display: none; }
+
+.carousel__track {
+  display: flex;
+  width: 100%;
+  will-change: transform;
+}
+
+.carousel__slide {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  height: 70vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.carousel__image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: var(--radius);
+}
+
+.carousel__counter {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+
+.carousel__dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  max-width: 100%;
+  padding: 0 16px;
+}
+
+.carousel__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.carousel__dot.active {
+  background: var(--brand-red);
+  transform: scale(1.3);
 }
 
 /* Gallery Lightbox */
