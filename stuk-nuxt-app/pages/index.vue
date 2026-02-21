@@ -31,7 +31,7 @@
           <!-- <h1>{{ currentMonth }} im StuK</h1> -->
            <h2>Kommende Veranstaltungen im StuK</h2>
           <p class="sub">Konzerte, Kleinkunst, Quiz, Clubnächte und mehr.</p>
-          <div class="badge"><span class="dot"></span> {{ todayOpeningInfo }}</div>
+          <div class="badge"><span class="dot" :class="{ open: isOpen }"></span> {{ todayOpeningInfo }}</div>
 
           <div style="margin-top:14px; display:flex; gap:12px; flex-wrap:wrap">
             <a class="btn" href="#events">Programm ansehen</a>
@@ -191,6 +191,8 @@ const todayOpeningInfo = computed(() => {
   return `Heute geöffnet ab ${hh}:${mm}`
 })
 
+const isOpen = computed(() => todayOpeningInfo.value === "Jetzt geöffnet")
+
 // Dynamische Maps URL basierend auf Device und OS
 const googleMapsUrl = 'https://maps.app.goo.gl/H2w1sCkS5DC5bTx37?g_st=ic'
 const appleMapsUrl = 'https://maps.apple.com/place?q=StuK+Leipzig&ll=51.3396,12.3731&address=Kochstra%C3%9Fe+132,+04277+Leipzig'
@@ -223,6 +225,11 @@ useHead({
 
 <style>
 /* Page-specific styles */
+.dot.open {
+  background: #22c55e;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.65);
+}
+
 .hero {
   padding: 70px 0 56px
 }
@@ -230,6 +237,21 @@ useHead({
 @media (max-width: 640px) {
   .hero {
     padding: 32px 0 0px;
+  }
+
+  .panel h2 {
+    font-size: 1.25rem;
+  }
+
+  .panel .btn {
+    font-size: 0.8rem;
+    padding: 0.45rem 0.75rem;
+    min-height: 36px;
+  }
+
+  .panel .badge {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
   }
 }
 
