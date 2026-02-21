@@ -57,6 +57,9 @@
       "type": "component",
       "component": "klubrat.kr-merkmale",
       "repeatable": true
+    },
+    "Dreierspitzel": {
+      "type": "boolean"
     }
   }
 }

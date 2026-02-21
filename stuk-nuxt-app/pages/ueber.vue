@@ -1,9 +1,17 @@
 <template>
   <main>
-    <section class="container glass-strong">
-      <h1>Über den StuK</h1>
-      <p class="sub">Studentischer Klub seit den 90ern – Kultur, Bar & Gemeinschaft.</p>
+    <!-- Slim Hero -->
+    <section class="ueber-hero">
+      <div class="ueber-hero__glow"></div>
+      <div class="ueber-hero__content">
+        <img src="/logo.svg" alt="StuK Leipzig" class="ueber-hero__logo" />
+        <div class="ueber-hero__divider"></div>
+        <h1 class="ueber-hero__title">Über den StuK</h1>
+        <p class="ueber-hero__sub">Studentischer Klub seit den 90ern – Kultur, Bar & Gemeinschaft.</p>
+      </div>
+    </section>
 
+    <section class="container glass-strong">
       <!-- Über uns: Desktop voll, Mobile gekürzt + Modal -->
       <div v-if="ueberUnsHtml" class="ueber-text">
         <!-- Desktop / Tablet: volle Länge -->
@@ -563,6 +571,84 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* Slim Hero */
+.ueber-hero {
+  position: relative;
+  padding: 56px 20px 48px;
+  text-align: center;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(188, 43, 37, 0.08) 0%, transparent 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ueber-hero__glow {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  height: 200px;
+  background: radial-gradient(ellipse, rgba(188, 43, 37, 0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.ueber-hero__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.ueber-hero__logo {
+  width: 80px;
+  height: auto;
+  opacity: 0.85;
+  filter: drop-shadow(0 2px 12px rgba(188, 43, 37, 0.25));
+}
+
+.ueber-hero__divider {
+  width: 48px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--brand-red), transparent);
+  margin: 16px 0;
+  border-radius: 1px;
+}
+
+.ueber-hero__title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+}
+
+.ueber-hero__sub {
+  color: var(--muted);
+  font-size: 1.05rem;
+  margin: 0;
+  max-width: 420px;
+}
+
+@media (max-width: 640px) {
+  .ueber-hero {
+    padding: 40px 16px 32px;
+  }
+
+  .ueber-hero__logo {
+    width: 60px;
+  }
+
+  .ueber-hero__title {
+    font-size: 1.5rem;
+  }
+
+  .ueber-hero__sub {
+    font-size: 0.95rem;
+  }
+}
+
 .glass-strong {
   background: rgba(12, 13, 15, 0.62);
   border: 1px solid rgba(255, 255, 255, 0.16);

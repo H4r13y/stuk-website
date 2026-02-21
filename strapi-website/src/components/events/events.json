@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_events_events",
+  "info": {
+    "displayName": "Events",
+    "icon": "calendar"
+  },
+  "options": {},
+  "attributes": {
+    "Eventname": {
+      "type": "string"
+    },
+    "start": {
+      "type": "datetime"
+    },
+    "labels": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::label.label"
+    }
+  },
+  "config": {}
+}

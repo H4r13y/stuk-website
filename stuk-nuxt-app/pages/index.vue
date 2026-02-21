@@ -17,7 +17,8 @@
         </div>
       </div>
 
-      <div class="scroll-indicator">
+      <div class="scroll-indicator" role="button" tabindex="0" aria-label="Zum Programm scrollen"
+        @click="scrollToProgram" @keydown.enter="scrollToProgram">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 5v14M19 12l-7 7-7-7" />
         </svg>
@@ -95,6 +96,10 @@ function stopSlider() {
     clearInterval(slideInterval)
     slideInterval = undefined
   }
+}
+
+function scrollToProgram() {
+  document.querySelector('.hero')?.scrollIntoView({ behavior: 'smooth' })
 }
 
 onMounted(() => {
@@ -380,7 +385,8 @@ useHead({
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
-  animation: bounce 2s infinite
+  animation: bounce 2s infinite;
+  cursor: pointer
 }
 
 .scroll-indicator svg {
@@ -402,6 +408,12 @@ useHead({
   }
 }
 
+@media (max-width: 640px) {
+  .scroll-indicator {
+    display: none
+  }
+}
+
 @media (max-width: 1000px) {
   .hero-content {
     flex-direction: column;
@@ -419,7 +431,7 @@ useHead({
   }
 
   .hero-text p {
-    font-size: 1.1rem
+    font-size: 0.9rem
   }
 }
 </style>
