@@ -9,6 +9,7 @@ export type {
 export type {
   Label,
   Event,
+  EventCollection,
 } from './events'
 
 export type {

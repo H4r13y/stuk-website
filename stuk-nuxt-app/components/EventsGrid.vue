@@ -142,16 +142,16 @@
               </button>
             </div>
             <div class="event-modal-content">
-              <h2>{{ selectedEvent.title }}</h2>
-              <p v-if="selectedEvent.description" class="event-description">
-                {{ selectedEvent.description }}
+              <h2>{{ selectedEvent.Title }}</h2>
+              <p v-if="selectedEvent.Description" class="event-description">
+                {{ selectedEvent.Description }}
               </p>
               <p v-else class="event-description muted">
                 Mehr Infos folgen bald!
               </p>
 
-              <div v-if="selectedEvent.labels && selectedEvent.labels.length > 0" class="event-labels">
-                <span v-for="label in selectedEvent.labels" :key="label.id" class="event-label">
+              <div v-if="selectedEvent.Lables && selectedEvent.Lables.length > 0" class="event-labels">
+                <span v-for="label in selectedEvent.Lables" :key="label.id" class="event-label">
                   {{ label.name }}
                 </span>
               </div>
@@ -165,7 +165,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue"
-import type { StrapiList, Label, Event } from "~/types"
+import type { StrapiList, Label, Event, EventCollection } from "~/types"
 
 const config = useRuntimeConfig()
 const strapiUrl = config.public.strapiUrl
@@ -187,6 +187,22 @@ const {
 })
 
 // Fetch: Events (lazy load on client)
+// Events sind jetzt Components innerhalb einer Collection → deep populate
+const eventsUrl =
+  `${strapiUrl}/api/events?` +
+  `pagination[pageSize]=100&` +
+  `populate[Events][populate]=Lables`
+
+const {
+  data: eventsRes,
+  pending: eventsPending,
+  error: eventsError,
+} = useFetch<StrapiList<EventCollection>>(eventsUrl, {
+  lazy: true,
+  server: false,
+})
+
+// Derived data: Flatten, filter Public, filter date range, sort by StartTime
 const now = new Date()
 const queryStart = new Date(now)
 // Zwischen 0–3 Uhr: auch Events von gestern einbeziehen (Nachtbetrieb)
@@ -194,28 +210,21 @@ if (now.getHours() < 3) {
   queryStart.setDate(queryStart.getDate() - 1)
 }
 queryStart.setHours(0, 0, 0, 0)
-const nowIso = queryStart.toISOString()
-const in31DaysIso = new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString()
+const in31Days = new Date(Date.now() + 31 * 24 * 60 * 60 * 1000)
 
-const eventsUrl =
-  `${strapiUrl}/api/events?` +
-  `pagination[pageSize]=100&` +
-  `sort=start:asc&` +
-  `populate=labels&` +
-  `filters[start][$gte]=${encodeURIComponent(nowIso)}&` +
-  `filters[start][$lte]=${encodeURIComponent(in31DaysIso)}`
-
-const {
-  data: eventsRes,
-  pending: eventsPending,
-  error: eventsError,
-} = useFetch<StrapiList<Event>>(eventsUrl, {
-  lazy: true,
-  server: false,
+const allEvents = computed(() => {
+  const collections = eventsRes.value?.data ?? []
+  // Alle Events aus allen Collections zusammenführen
+  const flat = collections.flatMap((c) => c.Events ?? [])
+  // Nur public Events
+  return flat
+    .filter((e) => e.Public === true)
+    .filter((e) => {
+      const d = new Date(e.StartTime)
+      return d >= queryStart && d <= in31Days
+    })
+    .sort((a, b) => new Date(a.StartTime).getTime() - new Date(b.StartTime).getTime())
 })
-
-// Derived data
-const allEvents = computed(() => eventsRes.value?.data ?? [])
 
 const filterTags = computed(() => {
   const names = (labelsRes.value?.data ?? []).map((l) => l.name)
@@ -227,7 +236,7 @@ const filteredEvents = computed(() => {
   if (activeFilters.value.length === 0) return events
 
   return events.filter((event) => {
-    const labels = event.labels ?? []
+    const labels = event.Lables ?? []
     return labels.some((l) => activeFilters.value.includes(l.name))
   })
 })
@@ -241,7 +250,7 @@ const twoWeeksFromNow = computed(() => {
 
 const visibleEvents = computed(() => {
   if (showAll.value) return filteredEvents.value
-  return filteredEvents.value.filter((e: Event) => new Date(e.start) <= twoWeeksFromNow.value)
+  return filteredEvents.value.filter((e: Event) => new Date(e.StartTime) <= twoWeeksFromNow.value)
 })
 
 const hiddenCount = computed(() => filteredEvents.value.length - visibleEvents.value.length)
@@ -271,7 +280,7 @@ const weekGroups = computed((): WeekGroup[] => {
   const groups: Map<number, { monday: Date; events: Event[] }> = new Map()
 
   for (const event of visibleEvents.value) {
-    const monday = getMonday(new Date(event.start))
+    const monday = getMonday(new Date(event.StartTime))
     const key = monday.getTime()
     if (!groups.has(key)) {
       groups.set(key, { monday, events: [] })
@@ -312,7 +321,7 @@ function handleEventClick(event: Event) {
 }
 
 function formatEventDate(event: Event) {
-  const date = new Date(event.start)
+  const date = new Date(event.StartTime)
   const weekdays = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
   const weekday = weekdays[date.getDay()]
   const day = date.getDate()
@@ -321,7 +330,7 @@ function formatEventDate(event: Event) {
 }
 
 function formatEventTime(event: Event) {
-  const date = new Date(event.start)
+  const date = new Date(event.StartTime)
   const hh = String(date.getHours()).padStart(2, "0")
   const mm = String(date.getMinutes()).padStart(2, "0")
   return `ab ${hh}:${mm} Uhr`

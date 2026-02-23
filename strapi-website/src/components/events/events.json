@@ -1,18 +1,43 @@
 {
   "collectionName": "components_events_events",
   "info": {
-    "displayName": "Events",
+    "displayName": "Event",
     "icon": "calendar"
   },
   "options": {},
   "attributes": {
-    "Eventname": {
-      "type": "string"
+    "Title": {
+      "type": "string",
+      "required": true
     },
-    "start": {
-      "type": "datetime"
+    "StartTime": {
+      "type": "datetime",
+      "required": true,
+      "default": "2026-02-22T18:00:18.400Z"
     },
-    "labels": {
+    "Public": {
+      "type": "boolean"
+    },
+    "Description": {
+      "type": "blocks"
+    },
+    "Media": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "Link": {
+      "type": "richtext"
+    },
+    "SpecialEvent": {
+      "type": "boolean"
+    },
+    "Lables": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::label.label"

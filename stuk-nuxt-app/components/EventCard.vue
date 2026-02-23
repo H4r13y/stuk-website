@@ -14,7 +14,7 @@
         <span class="date-mobile">{{ formattedDate }}</span>
         <span class="time-mobile-inline">{{ formattedTime }}</span>
       </div>
-      <h3>{{ event.title }}</h3>
+      <h3>{{ event.Title }}</h3>
       <p class="sub description-desktop" style="margin:0">
         {{ displayDescription }}
       </p>
@@ -36,7 +36,7 @@ const emit = defineEmits<{
 }>()
 
 const formattedDate = computed(() => {
-  const date = new Date(props.event.start)
+  const date = new Date(props.event.StartTime)
   const weekdays = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
   const weekday = weekdays[date.getDay()]
   const day = date.getDate()
@@ -45,7 +45,7 @@ const formattedDate = computed(() => {
 })
 
 const formattedTime = computed(() => {
-  const date = new Date(props.event.start)
+  const date = new Date(props.event.StartTime)
   const hh = String(date.getHours()).padStart(2, "0")
   const mm = String(date.getMinutes()).padStart(2, "0")
   return `ab ${hh}:${mm} Uhr`
@@ -53,14 +53,14 @@ const formattedTime = computed(() => {
 
 // Beschreibung: Label-Description oder Event-Description
 const displayDescription = computed(() => {
-  const labels = props.event.labels || []
+  const labels = props.event.Lables || []
 
   // Prüfe ob "Spezialevent" Label vorhanden ist
   const hasSpecialEvent = labels.some(label => label.name.toLowerCase() === 'spezialevent')
 
-  // Wenn Spezialevent: Zeige event.description
+  // Wenn Spezialevent: Zeige event.Description
   if (hasSpecialEvent) {
-    return props.event.description || "Mehr Infos folgen bald!"
+    return props.event.Description || "Mehr Infos folgen bald!"
   }
 
   // Sonst: Zeige die description vom ersten Label (falls vorhanden)

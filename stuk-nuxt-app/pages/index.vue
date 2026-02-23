@@ -133,12 +133,12 @@ const allEvents = computed((): Event[] => eventsGridRef.value?.allEvents ?? [])
 
 const specialEvents = computed(() => {
   return allEvents.value
-    .filter((e) => e.special_event === true)
+    .filter((e) => e.SpecialEvent === true)
     .map((e) => ({
       id: e.id,
-      title: e.title,
-      date: formatDate(e.start),
-      time: formatTime(e.start),
+      title: e.Title,
+      date: formatDate(e.StartTime),
+      time: formatTime(e.StartTime),
     }))
 })
 
@@ -162,7 +162,7 @@ const todayOpeningInfo = computed(() => {
     yesterdayEnd.setDate(yesterdayEnd.getDate() + 1)
 
     const yesterdayEvent = allEvents.value.find((event) => {
-      const d = new Date(event.start)
+      const d = new Date(event.StartTime)
       return d >= yesterday && d < yesterdayEnd
     })
     if (yesterdayEvent) return "Jetzt geöffnet"
@@ -174,13 +174,13 @@ const todayOpeningInfo = computed(() => {
   tomorrow.setDate(tomorrow.getDate() + 1)
 
   const todayEvent = allEvents.value.find((event) => {
-    const d = new Date(event.start)
+    const d = new Date(event.StartTime)
     return d >= today && d < tomorrow
   })
 
   if (!todayEvent) return "Heute geschlossen"
 
-  const eventStart = new Date(todayEvent.start)
+  const eventStart = new Date(todayEvent.StartTime)
 
   // Event hat bereits begonnen → jetzt geöffnet
   if (now >= eventStart) return "Jetzt geöffnet"

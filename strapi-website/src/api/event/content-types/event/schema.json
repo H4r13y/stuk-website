@@ -11,45 +11,14 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "title": {
+    "Title": {
       "type": "string",
       "required": true
     },
-    "start": {
-      "type": "datetime"
-    },
-    "end": {
-      "type": "datetime"
-    },
-    "public": {
-      "type": "boolean",
-      "required": true,
-      "default": false
-    },
-    "description": {
-      "type": "richtext"
-    },
-    "media": {
-      "type": "media",
-      "multiple": true,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos"
-      ]
-    },
-    "link": {
-      "type": "richtext"
-    },
-    "special_event": {
-      "type": "boolean",
-      "default": false
-    },
-    "labels": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::label.label",
-      "mappedBy": "events"
+    "Events": {
+      "type": "component",
+      "component": "events.events",
+      "repeatable": true
     }
   }
 }
