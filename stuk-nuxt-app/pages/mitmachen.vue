@@ -273,7 +273,7 @@ const roles = {
   bar: {
     title: 'Bar',
     subtitle: 'Mixen, ausschenken, Stimmung machen',
-    image: '/bilder/WhatsApp Image 2025-10-16 at 11.28.59 (1).jpeg',
+    image: '/bilder/DSC05029.JPG',
     description: 'An der Bar bist du das Herzstück jeder Veranstaltung. Du schenkst Getränke aus, sorgst für gute Stimmung und hast direkten Kontakt zu unseren Gästen. Die Bar ist der Ort, an dem du die meisten Leute kennenlernst und wo die Energie des Abends spürbar wird.',
     tasks: [
       'Getränke zapfen und mixen',
@@ -288,7 +288,7 @@ const roles = {
   einlass: {
     title: 'Einlass',
     subtitle: 'Gäste empfangen & Augen offen halten',
-    image: '/bilder/WhatsApp Image 2025-10-16 at 11.29.04.jpeg',
+    image: '/bilder/DSC05050.JPG',
     description: 'Am Einlass bist du das erste freundliche Gesicht für unsere Gäste. Du sorgst für einen reibungslosen Ablauf und ein sicheres Umfeld. Deine Aufgabe ist es, für eine angenehme Atmosphäre zu sorgen und gleichzeitig ein wachsames Auge zu haben.',
     tasks: [
       'Einlasskontrolle',
@@ -303,7 +303,7 @@ const roles = {
   technik: {
     title: 'Technik',
     subtitle: 'Licht & Sound – wir zeigen dir alles',
-    image: '/bilder/WhatsApp Image 2025-10-16 at 11.28.58 (2).jpeg',
+    image: '/bilder/DSC06805.jpg',
     description: 'Ohne gute Technik kein gutes Event! Du kümmerst dich um Licht, Sound und alles was dazugehört. Von der Planung über den Aufbau bis zur Betreuung während des Events – du machst aus jedem Abend ein audiovisuelles Erlebnis.',
     tasks: [
       'Aufbau und Betreuung der Anlage',
@@ -318,7 +318,7 @@ const roles = {
   booking: {
     title: 'Booking',
     subtitle: 'Acts anfragen & Programm kuratieren',
-    image: '/bilder/WhatsApp Image 2025-10-16 at 11.28.58 (1).jpeg',
+    image: '/bilder/PXL_20250328_182103563.MP.jpg',
     description: 'Du hast ein Händchen für gute Musik und spannende Acts? Dann gestalte unser Programm mit! Als Teil des Booking-Teams bist du dafür verantwortlich, Künstler zu kontaktieren, Events zu planen und das kulturelle Gesicht des StuK mitzugestalten.',
     tasks: [
       'Kontakt zu Künstlern und DJs',
@@ -333,7 +333,7 @@ const roles = {
   design: {
     title: 'Design',
     subtitle: 'Poster, Socials & Website',
-    image: '/bilder/WhatsApp Image 2025-10-16 at 11.28.59.jpeg',
+    image: '/bilder/DSC05145.JPG',
     description: 'Gib dem StuK sein visuelles Gesicht! Von Event-Postern bis Social Media – hier ist deine Kreativität gefragt. Du gestaltest die visuelle Identität des Clubs und sorgst dafür, dass unsere Events optisch genauso gut sind wie musikalisch.',
     tasks: [
       'Event-Poster und Flyer',
@@ -348,7 +348,7 @@ const roles = {
   orga: {
     title: 'Orga',
     subtitle: 'Schichtpläne & Abläufe',
-    image: '/bilder/WhatsApp Image 2025-10-16 at 11.29.03.jpeg',
+    image: '/bilder/DSC05033.JPG',
     description: 'Koordination ist dein Ding? In der Orga sorgst du dafür, dass alles reibungslos läuft. Du koordinierst Schichten, organisierst Meetings und behältst den Überblick über alle laufenden Projekte. Ohne dich wäre Chaos vorprogrammiert!',
     tasks: [
       'Schichtplanung koordinieren',

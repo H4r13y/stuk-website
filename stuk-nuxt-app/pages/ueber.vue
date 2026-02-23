@@ -80,7 +80,7 @@
 
       <div class="assembly-photo" style="background-image:url('/bilder/WhatsApp Image 2025-10-16 at 11.29.00.jpeg')">
         <div class="assembly-overlay">
-          <p>Unsere letzte Vollversammlung – gemeinsam gestalten wir den Club</p>
+          <p>Gemeinsam gestalten wir den Club</p>
         </div>
       </div>
 
@@ -103,8 +103,12 @@
         </div>
 
         <div class="carousel__dots">
-          <span v-for="(_, index) in galleryImages" :key="index" class="carousel__dot"
-            :class="{ active: index === carouselIndex }" @click="goToSlide(index)"></span>
+          <template v-for="item in carouselIndicators" :key="item.key">
+            <span v-if="item.type === 'dot'" class="carousel__dot" :class="{ active: item.index === carouselIndex }"
+              @click="goToSlide(item.index)"></span>
+
+            <span v-else class="carousel__ellipsis">…</span>
+          </template>
         </div>
 
         <div class="carousel__counter">{{ carouselIndex + 1 }} / {{ galleryImages.length }}</div>
@@ -527,6 +531,41 @@ watch(showUeberModal, (open) => {
 })
 watch(selectedMember, (member) => {
   document.body.style.overflow = member ? 'hidden' : ''
+})
+
+type CarouselIndicator =
+  | { type: 'dot'; index: number; key: string }
+  | { type: 'ellipsis'; key: string }
+
+const carouselIndicators = computed<CarouselIndicator[]>(() => {
+  const total = galleryImages.value.length
+  if (!total) return []
+
+  const maxDots = 5
+  if (total <= maxDots) {
+    return Array.from({ length: total }, (_, i) => ({
+      type: 'dot' as const,
+      index: i,
+      key: `dot-${i}`,
+    }))
+  }
+
+  const half = Math.floor(maxDots / 2) // 2
+  let start = carouselIndex.value - half
+  start = Math.max(0, Math.min(start, total - maxDots))
+
+  const dots = Array.from({ length: maxDots }, (_, i) => start + i)
+
+  const items: CarouselIndicator[] = []
+  if (start > 0) items.push({ type: 'ellipsis', key: 'ellipsis-left' })
+
+  for (const i of dots) {
+    items.push({ type: 'dot', index: i, key: `dot-${i}` })
+  }
+
+  if (start + maxDots < total) items.push({ type: 'ellipsis', key: 'ellipsis-right' })
+
+  return items
 })
 
 // --- Mobile Detection ---
@@ -1181,6 +1220,15 @@ onUnmounted(() => {
   color: var(--muted);
   font-size: 0.8rem;
   margin-top: 10px;
+}
+
+.carousel__ellipsis {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1;
+  padding: 0 2px;
+  user-select: none;
+  opacity: 0.8;
 }
 
 .carousel__dots {
