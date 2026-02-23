@@ -1691,22 +1691,15 @@ onUnmounted(() => {
 }
 
 /* Sichtbarkeit: Mobile vs Desktop */
-.desktop-only {
-  display: block;
-}
+/* Desktop: nichts setzen -> Element behält sein eigenes display (grid/flex/block/...) */
+.desktop-only {}
 
-.mobile-only {
-  display: none;
-}
+/* Standard: Mobile-only ist aus */
+.mobile-only { display: none; }
 
 @media (max-width: 640px) {
-  .desktop-only {
-    display: none;
-  }
-
-  .mobile-only {
-    display: block;
-  }
+  .desktop-only { display: none !important; }
+  .mobile-only { display: block; }
 }
 
 /* Mobile: Markdown gekürzt (Line Clamp) */
