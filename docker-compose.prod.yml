@@ -72,7 +72,7 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      NUXT_PUBLIC_STRAPI_URL: https://api.stuk.dev
+      NUXT_PUBLIC_STRAPI_URL: ""
     networks:
       - stuk-network
     depends_on:
