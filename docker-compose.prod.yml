@@ -5,11 +5,8 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
-      - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy-data:/data
-      - caddy-config:/config
     networks:
       - stuk-network
     depends_on:
@@ -85,8 +82,6 @@ services:
 volumes:
   postgres-data:
   strapi-uploads:
-  caddy-data:
-  caddy-config:
 
 networks:
   stuk-network:

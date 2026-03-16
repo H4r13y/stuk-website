@@ -1,13 +1,4 @@
-stuk.dev {
-  encode zstd gzip
-  
-  basicauth /* {
-    user $2a$14$M0MUP.YcpKjN7Clju/axIeiot1kAJxU53E8E2Ls05DSAkgmQ.aFp.
-  }
+:80 {
+  reverse_proxy /api/* strapi:1337
   reverse_proxy nuxt:3000
-}
-
-api.stuk.dev {
-  encode zstd gzip
-  reverse_proxy strapi:1337
 }
