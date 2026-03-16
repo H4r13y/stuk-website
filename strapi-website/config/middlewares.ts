@@ -4,7 +4,7 @@ module.exports = [
   {
     name: 'strapi::cors',
     config: {
-      origin: ['https://stuk.dev', 'https://dev.stuk-leipzig.de', 'http://localhost:3000'],
+      origin: ['https://stuk.dev', 'https://dev.stuk-leipzig.de', 'https://stuk-leipzig.de', 'http://localhost:3000'],
       headers: '*',
       methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
       credentials: true,
