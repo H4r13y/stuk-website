@@ -1,5 +1,3 @@
 :80 {
-	reverse_proxy /api/* strapi:1337
-	reverse_proxy /uploads/* strapi:1337
 	reverse_proxy nuxt:3000
 }

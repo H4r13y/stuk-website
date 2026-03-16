@@ -62,7 +62,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    # WICHTIG: keine ports nach außen!
+    ports:
+      - "1337:1337"
 
   nuxt:
     build:
@@ -72,7 +73,7 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      NUXT_PUBLIC_STRAPI_URL: ""
+      NUXT_PUBLIC_STRAPI_URL: https://api.stuk.dev
     networks:
       - stuk-network
     depends_on:
