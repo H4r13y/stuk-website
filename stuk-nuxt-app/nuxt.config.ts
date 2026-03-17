@@ -11,9 +11,14 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Private (nur server-side)
     emailStrapiToken: process.env.EMAIL_STRAPI_TOKEN || '',
+    strapiServer: process.env.NUXT_STRAPI_URL_SERVER || 'http://strapi-app:1337',
 
     // Public (client + server)
     public: {
+      
+      strapiBase: process.env.NUXT_PUBLIC_STRAPI_URL || 'https://dev.stuk-leipzig.de',
+      strapiPrefix: process.env.NUXT_PUBLIC_STRAPI_PREFIX || '/api',
+
       strapiUrl: process.env.NUXT_PUBLIC_STRAPI_URL || 'http://localhost:1337',
       emailStrapiToken: process.env.EMAIL_STRAPI_TOKEN || '',
     },
