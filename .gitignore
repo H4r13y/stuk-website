@@ -22,7 +22,7 @@ config.local.*
 # Project Specific
 ############################
 migration_strapi_daten.md
-*strapi.dump
+*strapi.dump*
 *uploads.tgz*
 strapi.sql
 
