@@ -6,7 +6,7 @@ WORKDIR /opt/app
 # Copy package files
 COPY package.json package-lock.json* ./
 
-# Install dependencies
+# Install all dependencies (once)
 RUN npm install --frozen-lockfile
 
 # Copy application files
@@ -14,6 +14,9 @@ COPY . .
 
 # Build Strapi admin panel
 RUN npm run build
+
+# Remove dev dependencies (fast, no network needed)
+RUN npm prune --omit=dev
 
 # Production stage
 FROM node:20-alpine
@@ -24,16 +27,13 @@ WORKDIR /opt/app
 # Switch to non-root user early
 USER node
 
-# Copy package files
-COPY --chown=node:node package.json package-lock.json* ./
-
-# Install production dependencies only
-RUN npm install --frozen-lockfile --production
-
 # Copy necessary files
 COPY --chown=node:node . .
 
-# Copy built application from build stage (overwrite)
+# Copy pruned node_modules from build stage (no second npm install!)
+COPY --chown=node:node --from=build /opt/app/node_modules ./node_modules
+
+# Copy built application from build stage
 COPY --chown=node:node --from=build /opt/app/dist ./dist
 
 # Create uploads directory
