@@ -54,7 +54,7 @@ export default defineNuxtConfig({
    */
   vite: {
     server: {
-      allowedHosts: ['stuk.dev'],
+      allowedHosts: ['stuk.dev', 'dev.stuk-leipzig.de', 'stuk-leipzig.de'],
       watch: {
         usePolling: true,
       },
