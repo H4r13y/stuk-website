@@ -65,28 +65,28 @@ export default {
       }
 
       // Email-Empfänger basierend auf Formulartyp
-      // const emailRecipients = {
-      //   general: 'kontakt@stuk-leipzig.de',
-      //   booking: 'booking@stuk-leipzig.de',
-      //   lost: 'fundsachen@stuk-leipzig.de',
-      //   board: 'vorstand@stuk-leipzig.de',
-      //   join: 'mitmachen@stuk-leipzig.de',
-      //   awareness: 'awareness@stuk-leipzig.de',
-      // };
-
       const emailRecipients = {
-        general: 'vorstand@stuk-leipzig.de',
-        booking: 'vorstand@stuk-leipzig.de',
-        lost: 'vorstand@stuk-leipzig.de',
+        general: 'kontakt@stuk-leipzig.de',
+        booking: 'booking@stuk-leipzig.de',
+        lost: 'fundsachen@stuk-leipzig.de',
         board: 'vorstand@stuk-leipzig.de',
-        join: 'vorstand@stuk-leipzig.de',
-        awareness: 'vorstand@stuk-leipzig.de',
-        pfand: 'vorstand@stuk-leipzig.de',
+        join: 'mitmachen@stuk-leipzig.de',
+        awareness: 'awareness@stuk-leipzig.de',
       };
 
-      // const recipient = emailRecipients[formType] || 'kontakt@stuk-leipzig.de';
+      // const emailRecipients = {
+      //   general: 'vorstand@stuk-leipzig.de',
+      //   booking: 'vorstand@stuk-leipzig.de',
+      //   lost: 'vorstand@stuk-leipzig.de',
+      //   board: 'vorstand@stuk-leipzig.de',
+      //   join: 'vorstand@stuk-leipzig.de',
+      //   awareness: 'vorstand@stuk-leipzig.de',
+      //   pfand: 'vorstand@stuk-leipzig.de',
+      // };
 
-      const recipient = emailRecipients[formType] || 'vorstand@stuk-leipzig.de';
+      const recipient = emailRecipients[formType] || 'kontakt@stuk-leipzig.de';
+
+      // const recipient = emailRecipients[formType] || 'vorstand@stuk-leipzig.de';
 
       // E-Mail-Betreff basierend auf Formulartyp
       const subjectMap = {
@@ -101,116 +101,101 @@ export default {
 
       const subject = subjectMap[formType] || 'Neue Kontaktanfrage';
 
-      // E-Mail-Body formatieren
+      // E-Mail-Body als HTML formatieren
       let emailBody = '';
 
       switch (formType) {
         case 'general':
           emailBody = `
-Neue allgemeine Anfrage über das Kontaktformular:
-
-Name: ${data.name}
-E-Mail: ${data.email}
-
-Nachricht:
-${data.message}
+<h2>Neue allgemeine Anfrage über das Kontaktformular</h2>
+<p><strong>Name:</strong> ${data.name}<br>
+<strong>E-Mail:</strong> ${data.email}</p>
+<h3>Nachricht</h3>
+<p>${(data.message || '').replace(/\n/g, '<br>')}</p>
           `;
           break;
 
         case 'booking':
           emailBody = `
-Neue Buchungsanfrage über das Kontaktformular:
-
-=== Persönliche Daten ===
-Name: ${data.name}
-E-Mail: ${data.email}
-Telefon: ${data.phone || 'Nicht angegeben'}
-
-=== Termin ===
-Verbindlichkeit: ${data.binding}
-Wunschdatum: ${data.date}
-Alternativdatum: ${data.alternativeDate || 'Nicht angegeben'}
-
-=== Band / Act ===
-Name: ${data.bandName}
-Stilrichtung: ${data.genre}
-Heimatstadt: ${data.hometown}
-Anzahl Personen: ${data.members}
-Webseite/Social: ${data.website || 'Nicht angegeben'}
-GEMA-Pflicht: ${data.gema}
-
-=== Sonstiges ===
-${data.notes || 'Keine weiteren Anmerkungen'}
+<h2>Neue Buchungsanfrage über das Kontaktformular</h2>
+<h3>Persönliche Daten</h3>
+<p><strong>Name:</strong> ${data.name}<br>
+<strong>E-Mail:</strong> ${data.email}<br>
+<strong>Telefon:</strong> ${data.phone || 'Nicht angegeben'}</p>
+<h3>Termin</h3>
+<p><strong>Verbindlichkeit:</strong> ${data.binding}<br>
+<strong>Wunschdatum:</strong> ${data.date}<br>
+<strong>Alternativdatum:</strong> ${data.alternativeDate || 'Nicht angegeben'}</p>
+<h3>Band / Act</h3>
+<p><strong>Name:</strong> ${data.bandName}<br>
+<strong>Stilrichtung:</strong> ${data.genre}<br>
+<strong>Heimatstadt:</strong> ${data.hometown}<br>
+<strong>Anzahl Personen:</strong> ${data.members}<br>
+<strong>Webseite/Social:</strong> ${data.website || 'Nicht angegeben'}<br>
+<strong>GEMA-Pflicht:</strong> ${data.gema}</p>
+<h3>Sonstiges</h3>
+<p>${(data.notes || 'Keine weiteren Anmerkungen').replace(/\n/g, '<br>')}</p>
           `;
           break;
 
         case 'lost':
           emailBody = `
-Neue Fundsachen-Anfrage:
-
-Name: ${data.name}
-E-Mail: ${data.email}
-Event / Datum: ${data.event}
-
-Beschreibung des verlorenen Gegenstands:
-${data.description}
+<h2>Neue Fundsachen-Anfrage</h2>
+<p><strong>Name:</strong> ${data.name}<br>
+<strong>E-Mail:</strong> ${data.email}<br>
+<strong>Event / Datum:</strong> ${data.event}</p>
+<h3>Beschreibung des verlorenen Gegenstands</h3>
+<p>${(data.description || '').replace(/\n/g, '<br>')}</p>
           `;
           break;
 
         case 'board':
           emailBody = `
-Neue Anfrage an den Vorstand:
-
-Name / Organisation: ${data.name}
-E-Mail: ${data.email}
-Betreff: ${data.subject}
-
-Nachricht:
-${data.message}
+<h2>Neue Anfrage an den Vorstand</h2>
+<p><strong>Name / Organisation:</strong> ${data.name}<br>
+<strong>E-Mail:</strong> ${data.email}<br>
+<strong>Betreff:</strong> ${data.subject}</p>
+<h3>Nachricht</h3>
+<p>${(data.message || '').replace(/\n/g, '<br>')}</p>
           `;
           break;
 
         case 'join':
           emailBody = `
-Neue Bewerbung:
-
-Name: ${data.name}
-E-Mail: ${data.email}
-Telefon: ${data.phone || 'Nicht angegeben'}
-Gewünschter Bereich: ${data.area}
+<h2>Neue Bewerbung</h2>
+<p><strong>Name:</strong> ${data.name}<br>
+<strong>E-Mail:</strong> ${data.email}<br>
+<strong>Telefon:</strong> ${data.phone || 'Nicht angegeben'}<br>
+<strong>Gewünschter Bereich:</strong> ${data.area}</p>
           `;
           break;
 
         case 'awareness':
           emailBody = `
-[AWARENESS] Neue anonyme Meldung
-
-Event / Datum: ${data.event || 'Nicht angegeben'}
-
-Beschreibung des Vorfalls:
-${data.description}
-
-HINWEIS: Diese Meldung wurde anonym eingereicht. Kontaktdaten wurden nicht erfasst.
+<h2>[AWARENESS] Neue anonyme Meldung</h2>
+<p><strong>Event / Datum:</strong> ${data.event || 'Nicht angegeben'}</p>
+<h3>Beschreibung des Vorfalls</h3>
+<p>${(data.description || '').replace(/\n/g, '<br>')}</p>
+<hr>
+<p><em>HINWEIS: Diese Meldung wurde anonym eingereicht. Kontaktdaten wurden nicht erfasst.</em></p>
           `;
           break;
 
         case 'pfand':
           emailBody = `
-Neue Pfand-Bewerbung (über Pfandmarken-Seite):
-
-Name: ${data.name}
-E-Mail: ${data.email}
-Telefon: ${data.phone || 'Nicht angegeben'}
-
-HINWEIS: Diese Bewerbung kam über die humorvolle Pfandmarken-Seite.
+<h2>Neue Pfand-Bewerbung (über Pfandmarken-Seite)</h2>
+<p><strong>Name:</strong> ${data.name}<br>
+<strong>E-Mail:</strong> ${data.email}<br>
+<strong>Telefon:</strong> ${data.phone || 'Nicht angegeben'}</p>
+<hr>
+<p><em>HINWEIS: Diese Bewerbung kam über die humorvolle Pfandmarken-Seite.</em></p>
           `;
           break;
 
         default:
           emailBody = `
-Neue Kontaktanfrage:
-
-${JSON.stringify(data, null, 2)}
+<h2>Neue Kontaktanfrage</h2>
+<pre>${JSON.stringify(data, null, 2)}</pre>
           `;
       }
 
@@ -220,7 +205,7 @@ ${JSON.stringify(data, null, 2)}
         from: process.env.SMTP_DEFAULT_FROM || 'kontakt@stuk-leipzig.de',
         replyTo: data.email || process.env.SMTP_DEFAULT_REPLY_TO,
         subject: subject,
-        text: emailBody,
+        html: emailBody,
       });
 
       // Bestätigungs-E-Mail an Absender (optional, außer bei Awareness)
@@ -240,21 +225,17 @@ ${JSON.stringify(data, null, 2)}
           to: data.email,
           from: process.env.SMTP_DEFAULT_FROM || 'kontakt@stuk-leipzig.de',
           subject: `Bestätigung: ${subject}`,
-          text: `
-Hallo ${data.name || 'liebe/r Interessent/in'},
-
-${confirmationText}
-
-Deine Anfrage wurde erfolgreich bei uns eingereicht.
-
-Viele Grüße
-Das StuK-Team
-
----
-StuK Leipzig
-Nürnberger Straße 42
-04103 Leipzig
-www.stuk-leipzig.de
+          html: `
+<p>Hallo ${data.name || 'liebe/r Interessent/in'},</p>
+<p>${confirmationText}</p>
+<p>Deine Anfrage wurde erfolgreich bei uns eingereicht.</p>
+<p>Viele Grüße<br>
+Das StuK-Team</p>
+<hr>
+<p><small>StuK Leipzig<br>
+Nürnberger Straße 42<br>
+04103 Leipzig<br>
+www.stuk-leipzig.de</small></p>
           `,
         });
       }
