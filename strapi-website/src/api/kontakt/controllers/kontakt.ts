@@ -66,7 +66,7 @@ export default {
 
       // Email-Empfänger basierend auf Formulartyp
       const emailRecipients = {
-        general: 'kontakt@stuk-leipzig.de',
+        general: 'info@stuk-leipzig.de',
         booking: 'booking@stuk-leipzig.de',
         lost: 'fundsachen@stuk-leipzig.de',
         board: 'vorstand@stuk-leipzig.de',
