@@ -84,7 +84,7 @@ export default {
       //   pfand: 'vorstand@stuk-leipzig.de',
       // };
 
-      const recipient = emailRecipients[formType] || 'kontakt@stuk-leipzig.de';
+      const recipient = emailRecipients[formType] || 'info@stuk-leipzig.de';
 
       // const recipient = emailRecipients[formType] || 'vorstand@stuk-leipzig.de';
 
