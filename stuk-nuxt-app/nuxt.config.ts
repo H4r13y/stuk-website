@@ -21,6 +21,8 @@ export default defineNuxtConfig({
 
       strapiUrl: process.env.NUXT_PUBLIC_STRAPI_URL || 'http://localhost:1337',
       emailStrapiToken: process.env.EMAIL_STRAPI_TOKEN || '',
+      inventurPin: process.env.NUXT_INVENTUR_PIN || '1234',
+      inventurApiToken: process.env.NUXT_INVENTUR_API_TOKEN || '',
     },
   },
 

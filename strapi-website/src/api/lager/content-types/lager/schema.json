@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "lagers",
+  "info": {
+    "singularName": "lager",
+    "pluralName": "lagers",
+    "displayName": "Lager",
+    "description": "Lagerorte (Saal, Keller, ...)"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "beschreibung": {
+      "type": "text"
+    },
+    "aktiv": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

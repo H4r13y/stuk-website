@@ -1,0 +1,118 @@
+{
+  "kind": "collectionType",
+  "collectionName": "getraenkelagers",
+  "info": {
+    "singularName": "getraenkelager",
+    "pluralName": "getraenkelagers",
+    "displayName": "Getränk",
+    "description": "Artikel im Getränkelager"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "sku": {
+      "type": "uid",
+      "targetField": "name"
+    },
+    "artikelnummer_lieferant": {
+      "type": "string"
+    },
+    "ean": {
+      "type": "string"
+    },
+    "groesse_liter": {
+      "type": "decimal",
+      "required": true
+    },
+    "verkaufseinheit": {
+      "type": "decimal"
+    },
+    "gebindeart": {
+      "type": "enumeration",
+      "enum": [
+        "Glas_Mehrweg",
+        "Glas_Einweg",
+        "PET",
+        "Dose",
+        "Fass",
+        "Sonstiges"
+      ]
+    },
+    "vpe": {
+      "type": "integer",
+      "required": true,
+      "default": 1
+    },
+    "alkoholgehalt": {
+      "type": "decimal"
+    },
+    "steuersatz": {
+      "type": "enumeration",
+      "enum": ["mwst_7", "mwst_19", "mwst_0"],
+      "default": "mwst_19",
+      "required": true
+    },
+    "ek_preis_netto": {
+      "type": "decimal",
+      "required": true
+    },
+    "vk_preis_netto": {
+      "type": "decimal",
+      "required": true
+    },
+    "marge_prozent": {
+      "type": "decimal"
+    },
+    "pfand_einzel": {
+      "type": "decimal",
+      "default": 0
+    },
+    "pfand_gebinde": {
+      "type": "decimal",
+      "default": 0
+    },
+    "aktiv": {
+      "type": "boolean",
+      "default": true
+    },
+    "bild": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "kommentar": {
+      "type": "text"
+    },
+    "lieferant": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::lieferant.lieferant",
+      "inversedBy": "getraenke"
+    },
+    "kategorie": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::kategorie.kategorie",
+      "inversedBy": "getraenke"
+    },
+    "vertriebsgruppe": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::vertriebsgruppe.vertriebsgruppe",
+      "inversedBy": "getraenke"
+    },
+    "lagerbestaende": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::lagerbestand.lagerbestand",
+      "mappedBy": "getraenk"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "vertriebsgruppen",
+  "info": {
+    "singularName": "vertriebsgruppe",
+    "pluralName": "vertriebsgruppen",
+    "displayName": "Vertriebsgruppe",
+    "description": "Ansprechpartner, Rückvergütungen und Kontaktdaten pro Vertriebsgruppe"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "ansprechpartner": {
+      "type": "string"
+    },
+    "email": {
+      "type": "email"
+    },
+    "telefon": {
+      "type": "string"
+    },
+    "adresse": {
+      "type": "text"
+    },
+    "rueckverguetungen": {
+      "type": "text"
+    },
+    "kommentar": {
+      "type": "text"
+    },
+    "getraenke": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::getraenkelager.getraenkelager",
+      "mappedBy": "vertriebsgruppe"
+    }
+  }
+}

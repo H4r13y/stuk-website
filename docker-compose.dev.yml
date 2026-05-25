@@ -22,10 +22,9 @@ services:
   strapi:
     build:
       context: ./strapi-website
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: strapi-app
     restart: unless-stopped
-    command: npm run develop
     environment:
       HOST: ${HOST}
       PORT: ${PORT}
@@ -59,12 +58,12 @@ services:
   nuxt:
     build:
       context: ./stuk-nuxt-app
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: nuxt-app
     restart: unless-stopped
-    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0 --port 3000"
     environment:
-      STRAPI_URL: http://strapi:1337
+      NUXT_PUBLIC_STRAPI_URL: http://strapi:1337
+      NUXT_STRAPI_URL_SERVER: http://strapi:1337
       CHOKIDAR_USEPOLLING: "true"
       WATCHPACK_POLLING: "true"
     volumes:
@@ -77,7 +76,6 @@ services:
       - stuk-network
     depends_on:
       - strapi
-
 
 volumes:
   postgres-data:

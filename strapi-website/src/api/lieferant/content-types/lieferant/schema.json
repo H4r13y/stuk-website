@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "lieferants",
+  "info": {
+    "singularName": "lieferant",
+    "pluralName": "lieferants",
+    "displayName": "Lieferant",
+    "description": "Lieferanten für das Getränkelager"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "kundennummer": {
+      "type": "string"
+    },
+    "ansprechpartner": {
+      "type": "string"
+    },
+    "email": {
+      "type": "email"
+    },
+    "telefon": {
+      "type": "string"
+    },
+    "adresse": {
+      "type": "text"
+    },
+    "webseite": {
+      "type": "string"
+    },
+    "notiz": {
+      "type": "text"
+    },
+    "getraenke": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::getraenkelager.getraenkelager",
+      "mappedBy": "lieferant"
+    }
+  }
+}

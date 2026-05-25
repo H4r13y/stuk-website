@@ -1,0 +1,34 @@
+{
+  "kind": "collectionType",
+  "collectionName": "kategorien",
+  "info": {
+    "singularName": "kategorie",
+    "pluralName": "kategorien",
+    "displayName": "Kategorie",
+    "description": "Produktkategorien (Bier, Wein, Softdrinks, ...)"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "beschreibung": {
+      "type": "text"
+    },
+    "sortierung": {
+      "type": "integer",
+      "default": 0
+    },
+    "getraenke": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::getraenkelager.getraenkelager",
+      "mappedBy": "kategorie"
+    }
+  }
+}

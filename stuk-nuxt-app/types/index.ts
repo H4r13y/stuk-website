@@ -22,3 +22,16 @@ export type {
   DatenschutzData,
   ImpressumData,
 } from './content'
+
+export type {
+  Gebindeart,
+  Steuersatz,
+  Lieferant,
+  Kategorie,
+  Lager,
+  Lagerbestand,
+  Vertriebsgruppe,
+  Getraenk,
+  InventurCount,
+  InventurSession,
+} from './lager'

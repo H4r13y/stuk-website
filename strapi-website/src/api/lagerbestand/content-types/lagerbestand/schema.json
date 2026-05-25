@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "lagerbestaende",
+  "info": {
+    "singularName": "lagerbestand",
+    "pluralName": "lagerbestaende",
+    "displayName": "Lagerbestand",
+    "description": "Bestandsmenge pro Artikel pro Lagerort"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "getraenk": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::getraenkelager.getraenkelager",
+      "inversedBy": "lagerbestaende"
+    },
+    "lager": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::lager.lager"
+    },
+    "menge": {
+      "type": "integer",
+      "required": true,
+      "default": 0
+    },
+    "mindestbestand": {
+      "type": "integer",
+      "default": 0
+    },
+    "maximalbestand": {
+      "type": "integer"
+    }
+  }
+}
