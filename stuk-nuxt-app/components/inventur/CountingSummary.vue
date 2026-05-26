@@ -35,7 +35,7 @@ const uncountedItems = computed(
     <div v-if="isSubmitted" class="summary-success">
       <div class="success-icon">&#10003;</div>
       <h2>Zählung abgeschlossen!</h2>
-      <p class="success-detail">{{ progress.done }} Artikel übermittelt.</p>
+      <p class="success-detail">{{ submitTotal }} Artikel übermittelt.</p>
       <button class="btn-reset" @click="resetAll">Neue Zählung</button>
     </div>
 

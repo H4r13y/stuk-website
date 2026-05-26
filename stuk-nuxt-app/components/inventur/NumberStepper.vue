@@ -10,17 +10,50 @@ const emit = defineEmits<{
   'open-numpad': []
 }>()
 
-let longPressTimer: ReturnType<typeof setInterval> | null = null
+let longPressTimer: ReturnType<typeof setTimeout> | null = null
+let repeatTimer: ReturnType<typeof setInterval> | null = null
+let longPressFired = false
 
-function increment() {
-  emit('update:modelValue', props.modelValue + 1)
-  vibrate()
+function onPointerDown(direction: 'up' | 'down') {
+  longPressFired = false
+  // Nach 400ms Long-Press starten
+  longPressTimer = setTimeout(() => {
+    longPressFired = true
+    vibrate()
+    repeatTimer = setInterval(() => {
+      if (direction === 'up') {
+        emit('update:modelValue', props.modelValue + 1)
+      } else if (props.modelValue > 0) {
+        emit('update:modelValue', props.modelValue - 1)
+      }
+    }, 100)
+  }, 400)
 }
 
-function decrement() {
-  if (props.modelValue <= 0) return
-  emit('update:modelValue', props.modelValue - 1)
-  vibrate()
+function cancelTimers() {
+  if (longPressTimer) {
+    clearTimeout(longPressTimer)
+    longPressTimer = null
+  }
+  if (repeatTimer) {
+    clearInterval(repeatTimer)
+    repeatTimer = null
+  }
+}
+
+function onPointerUp(direction: 'up' | 'down') {
+  const wasLongPress = longPressFired
+  cancelTimers()
+  longPressFired = false
+  // Nur bei kurzem Tap (kein Long-Press) einmal auslösen
+  if (!wasLongPress) {
+    if (direction === 'up') {
+      emit('update:modelValue', props.modelValue + 1)
+    } else if (props.modelValue > 0) {
+      emit('update:modelValue', props.modelValue - 1)
+    }
+    vibrate()
+  }
 }
 
 function incrementFive() {
@@ -31,26 +64,6 @@ function incrementFive() {
 function decrementFive() {
   emit('update:modelValue', Math.max(0, props.modelValue - 5))
   vibrate()
-}
-
-function startLongPress(direction: 'up' | 'down') {
-  let count = 0
-  longPressTimer = setInterval(() => {
-    count++
-    if (direction === 'up') {
-      emit('update:modelValue', props.modelValue + 1)
-    } else if (props.modelValue > 0) {
-      emit('update:modelValue', props.modelValue - 1)
-    }
-    if (count === 1) vibrate()
-  }, 120)
-}
-
-function stopLongPress() {
-  if (longPressTimer) {
-    clearInterval(longPressTimer)
-    longPressTimer = null
-  }
 }
 
 function vibrate() {
@@ -73,10 +86,9 @@ function vibrate() {
       <button
         class="stepper-btn minus"
         :disabled="modelValue <= 0"
-        @click="decrement"
-        @pointerdown="startLongPress('down')"
-        @pointerup="stopLongPress"
-        @pointerleave="stopLongPress"
+        @pointerdown.prevent="onPointerDown('down')"
+        @pointerup.prevent="onPointerUp('down')"
+        @pointerleave="cancelTimers"
       >
         &minus;
       </button>
@@ -85,10 +97,9 @@ function vibrate() {
       </button>
       <button
         class="stepper-btn plus"
-        @click="increment"
-        @pointerdown="startLongPress('up')"
-        @pointerup="stopLongPress"
-        @pointerleave="stopLongPress"
+        @pointerdown.prevent="onPointerDown('up')"
+        @pointerup.prevent="onPointerUp('up')"
+        @pointerleave="cancelTimers"
       >
         +
       </button>
