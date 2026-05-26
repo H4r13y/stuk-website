@@ -4,6 +4,7 @@ import type { InventurCount } from '~/types'
 const props = defineProps<{
   name: string
   items: InventurCount[]
+  compact?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -30,6 +31,7 @@ const countedInGroup = computed(
         v-for="item in items"
         :key="item.getraenkDocumentId"
         :count="item"
+        :compact="compact"
         @update="(field, value) => emit('update', item.getraenkDocumentId, field, value)"
       />
     </div>

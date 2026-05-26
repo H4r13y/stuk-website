@@ -3,6 +3,7 @@ import type { InventurCount } from '~/types'
 
 const props = defineProps<{
   count: InventurCount
+  compact?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -14,6 +15,7 @@ const { getTotal } = useInventur()
 const numpadVisible = ref(false)
 const numpadField = ref<'kaesten' | 'einzelflaschen'>('kaesten')
 const numpadInitial = ref(0)
+const imageVisible = ref(false)
 
 const total = computed(() => getTotal(props.count))
 const isCounted = computed(() => props.count.kaesten > 0 || props.count.einzelflaschen > 0)
@@ -34,19 +36,31 @@ function confirmNumpad(value: number) {
   <div class="article" :class="{ counted: isCounted }">
     <div class="article-header">
       <span class="article-name">{{ count.name }}</span>
-      <span class="article-vpe">{{ count.vpe }} Fl./Kasten</span>
+      <button
+        v-if="count.bildUrl"
+        class="img-btn"
+        @click="imageVisible = !imageVisible"
+      >
+        &#128247;
+      </button>
+      <span class="article-vpe">{{ count.vpe }} VKE/Gebinde</span>
     </div>
 
-    <div class="article-steppers">
+    <div v-if="imageVisible && count.bildUrl" class="article-image-wrap">
+      <img :src="count.bildUrl" :alt="count.name" class="article-image" />
+    </div>
+
+    <div class="article-steppers" :class="{ 'steppers-row': compact }">
       <InventurNumberStepper
         :model-value="count.kaesten"
-        label="Kästen"
+        label="Kästen/Gebinde"
         @update:model-value="emit('update', 'kaesten', $event)"
         @open-numpad="openNumpad('kaesten')"
       />
       <InventurNumberStepper
         :model-value="count.einzelflaschen"
-        label="Einzeln"
+        label="Einzelflaschen"
+        :show-five-buttons="!compact"
         @update:model-value="emit('update', 'einzelflaschen', $event)"
         @open-numpad="openNumpad('einzelflaschen')"
       />
@@ -58,7 +72,7 @@ function confirmNumpad(value: number) {
 
     <InventurNumberPadModal
       :visible="numpadVisible"
-      :label="numpadField === 'kaesten' ? 'Kästen' : 'Einzelflaschen'"
+      :label="numpadField === 'kaesten' ? 'Kästen/Gebinde' : 'Einzelflaschen'"
       :initial-value="numpadInitial"
       @confirm="confirmNumpad"
       @cancel="numpadVisible = false"
@@ -93,6 +107,38 @@ function confirmNumpad(value: number) {
   color: var(--text);
 }
 
+.img-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #16181f;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+.img-btn:active {
+  background: #1e2029;
+}
+
+.article-image-wrap {
+  margin-bottom: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.article-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 .article-vpe {
   font-size: 0.8rem;
   color: var(--muted);
@@ -101,8 +147,14 @@ function confirmNumpad(value: number) {
 
 .article-steppers {
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
+  align-items: center;
   gap: 12px;
+}
+
+.article-steppers.steppers-row {
+  flex-direction: row;
+  justify-content: space-around;
 }
 
 .article-total {

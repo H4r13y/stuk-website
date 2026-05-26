@@ -8,6 +8,7 @@ const {
   fetchLager,
   selectLager,
   loadSession,
+  syncArticles,
 } = useInventur()
 
 // Check for existing session on mount
@@ -15,6 +16,8 @@ onMounted(async () => {
   const hasSession = loadSession()
   if (hasSession) {
     step.value = 'counting'
+    // Neue Artikel aus API nachladen und in Session mergen
+    await syncArticles()
   }
 
   await fetchLager()

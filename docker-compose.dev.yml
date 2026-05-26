@@ -62,7 +62,7 @@ services:
     container_name: nuxt-app
     restart: unless-stopped
     environment:
-      NUXT_PUBLIC_STRAPI_URL: http://strapi:1337
+      NUXT_PUBLIC_STRAPI_URL: http://localhost:1337
       NUXT_STRAPI_URL_SERVER: http://strapi:1337
       CHOKIDAR_USEPOLLING: "true"
       WATCHPACK_POLLING: "true"

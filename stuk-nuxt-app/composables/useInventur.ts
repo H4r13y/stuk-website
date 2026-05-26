@@ -1,6 +1,7 @@
 import type { Getraenk, Lager, InventurCount, InventurSession } from '~/types'
 
-const STORAGE_KEY = 'inventur_session'
+const STORAGE_PREFIX = 'inventur_session_'
+const ACTIVE_LAGER_KEY = 'inventur_active_lager'
 
 type Step = 'pin' | 'lager' | 'counting' | 'summary'
 
@@ -15,6 +16,7 @@ const submitProgress = ref(0)
 const submitTotal = ref(0)
 const isSubmitted = ref(false)
 const sortMode = ref<'kategorie' | 'alphabetisch'>('kategorie')
+const viewMode = ref<'gross' | 'kompakt'>('gross')
 
 export function useInventur() {
   const config = useRuntimeConfig()
@@ -22,21 +24,32 @@ export function useInventur() {
   const apiToken = config.public.inventurApiToken as string
   const pin = config.public.inventurPin as string
 
+  // --- Auth Headers (für alle API-Calls) ---
+  function authHeaders(): Record<string, string> {
+    const h: Record<string, string> = { 'Content-Type': 'application/json' }
+    if (apiToken) h['Authorization'] = `Bearer ${apiToken}`
+    return h
+  }
+
   // --- PIN ---
   function verifyPin(input: string): boolean {
     return input === pin
   }
 
-  // --- localStorage ---
+  // --- localStorage (pro Lager) ---
   function persistSession() {
     if (!session.value) return
     if (import.meta.server) return
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(session.value))
+    const key = STORAGE_PREFIX + session.value.lagerDocumentId
+    localStorage.setItem(key, JSON.stringify(session.value))
+    localStorage.setItem(ACTIVE_LAGER_KEY, session.value.lagerDocumentId)
   }
 
   function loadSession(): boolean {
     if (import.meta.server) return false
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const activeLagerId = localStorage.getItem(ACTIVE_LAGER_KEY)
+    if (!activeLagerId) return false
+    const raw = localStorage.getItem(STORAGE_PREFIX + activeLagerId)
     if (!raw) return false
     try {
       session.value = JSON.parse(raw) as InventurSession
@@ -46,29 +59,47 @@ export function useInventur() {
     }
   }
 
+  function loadSessionForLager(lagerDocumentId: string): boolean {
+    if (import.meta.server) return false
+    const raw = localStorage.getItem(STORAGE_PREFIX + lagerDocumentId)
+    if (!raw) return false
+    try {
+      session.value = JSON.parse(raw) as InventurSession
+      localStorage.setItem(ACTIVE_LAGER_KEY, lagerDocumentId)
+      return true
+    } catch {
+      return false
+    }
+  }
+
   function clearSession() {
-    session.value = null
+    if (!session.value) return
     if (import.meta.server) return
-    localStorage.removeItem(STORAGE_KEY)
+    localStorage.removeItem(STORAGE_PREFIX + session.value.lagerDocumentId)
+    localStorage.removeItem(ACTIVE_LAGER_KEY)
+    session.value = null
   }
 
   // --- API: Load Lager ---
   async function fetchLager() {
-    const { data } = await useFetch<{ data: Lager[] }>(
-      `${strapiUrl}/api/lagers?filters[aktiv][$eq]=true`,
-      { server: false }
-    )
-    if (data.value?.data) {
-      lagerOptions.value = data.value.data
+    try {
+      const res = await $fetch<{ data: Lager[] }>(
+        `${strapiUrl}/api/lagers?filters[aktiv][$eq]=true`,
+        { headers: authHeaders() }
+      )
+      lagerOptions.value = res.data || []
+    } catch (e) {
+      console.error('Fehler beim Laden der Lager:', e)
+      lagerOptions.value = []
     }
   }
 
   // --- API: Load Getränke ---
-  async function fetchArticles(lagerDocumentId: string) {
+  async function fetchArticles() {
     isLoading.value = true
     try {
-      const url = `${strapiUrl}/api/getraenkelagers?filters[aktiv][$eq]=true&populate[kategorie][fields][0]=name&populate[kategorie][fields][1]=sortierung&populate[lagerbestaende][populate][lager][fields][0]=documentId&pagination[pageSize]=200&sort=name:asc`
-      const res = await $fetch<{ data: Getraenk[] }>(url)
+      const url = `${strapiUrl}/api/getraenkelagers?filters[aktiv][$eq]=true&populate[kategorie][fields][0]=name&populate[kategorie][fields][1]=sortierung&populate[lagerbestaende][populate][lager][fields][0]=documentId&populate[bild][fields][0]=url&populate[bild][fields][1]=formats&pagination[pageSize]=200&sort=name:asc`
+      const res = await $fetch<{ data: Getraenk[] }>(url, { headers: authHeaders() })
       articles.value = res.data || []
     } catch (e) {
       console.error('Fehler beim Laden der Artikel:', e)
@@ -78,22 +109,28 @@ export function useInventur() {
     }
   }
 
-  // --- Session starten ---
-  async function selectLager(lager: Lager) {
-    session.value = {
-      lagerDocumentId: lager.documentId,
-      lagerName: lager.name,
-      startedAt: new Date().toISOString(),
-      counts: {},
-    }
+  // --- Artikel aus API in Session mergen (neue ergänzen, bestehende behalten) ---
+  async function syncArticles() {
+    if (!session.value) return
+    const lagerDocumentId = session.value.lagerDocumentId
 
-    await fetchArticles(lager.documentId)
+    await fetchArticles()
 
-    // Initialize counts for all articles
+    let added = 0
     for (const article of articles.value) {
+      if (session.value.counts[article.documentId]) continue
+
       const bestand = article.lagerbestaende?.find(
-        (b) => b.lager?.documentId === lager.documentId
+        (b: { lager?: { documentId?: string } }) => b.lager?.documentId === lagerDocumentId
       )
+      const rawBildUrl = article.bild?.formats?.small?.url
+        ?? article.bild?.formats?.thumbnail?.url
+        ?? article.bild?.url
+        ?? null
+      const bildUrl = rawBildUrl && rawBildUrl.startsWith('/')
+        ? `${strapiUrl}${rawBildUrl}`
+        : rawBildUrl
+
       session.value.counts[article.documentId] = {
         getraenkDocumentId: article.documentId,
         lagerbestandDocumentId: bestand?.documentId ?? null,
@@ -103,10 +140,28 @@ export function useInventur() {
         kaesten: 0,
         einzelflaschen: 0,
         vpe: article.vpe,
+        bildUrl,
+      }
+      added++
+    }
+
+    if (added > 0) persistSession()
+  }
+
+  // --- Session starten / wiederherstellen ---
+  async function selectLager(lager: Lager) {
+    const hasExistingSession = loadSessionForLager(lager.documentId)
+
+    if (!hasExistingSession) {
+      session.value = {
+        lagerDocumentId: lager.documentId,
+        lagerName: lager.name,
+        startedAt: new Date().toISOString(),
+        counts: {},
       }
     }
 
-    persistSession()
+    await syncArticles()
     step.value = 'counting'
   }
 
@@ -185,12 +240,7 @@ export function useInventur() {
     )
     submitTotal.value = entries.length
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    }
-    if (apiToken) {
-      headers['Authorization'] = `Bearer ${apiToken}`
-    }
+    const headers = authHeaders()
 
     // Process in batches of 3
     for (let i = 0; i < entries.length; i += 3) {
@@ -233,6 +283,21 @@ export function useInventur() {
     clearSession()
   }
 
+  // --- Lager wechseln (zurück zur Auswahl, Session bleibt erhalten) ---
+  function changeLager() {
+    step.value = 'lager'
+  }
+
+  // --- Zählung für aktuelles Lager zurücksetzen ---
+  function resetCounts() {
+    if (!session.value) return
+    for (const key of Object.keys(session.value.counts)) {
+      session.value.counts[key].kaesten = 0
+      session.value.counts[key].einzelflaschen = 0
+    }
+    persistSession()
+  }
+
   // --- Reset ---
   function resetAll() {
     clearSession()
@@ -255,6 +320,7 @@ export function useInventur() {
     submitTotal,
     isSubmitted,
     sortMode,
+    viewMode,
 
     // Computed
     progress,
@@ -268,7 +334,10 @@ export function useInventur() {
     getTotal,
     submitInventur,
     loadSession,
+    syncArticles,
     persistSession,
+    changeLager,
+    resetCounts,
     resetAll,
   }
 }

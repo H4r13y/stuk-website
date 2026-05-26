@@ -94,6 +94,7 @@ export interface InventurCount {
   kaesten: number
   einzelflaschen: number
   vpe: number
+  bildUrl: string | null
 }
 
 /** Inventur – Gesamte Zähl-Session */
