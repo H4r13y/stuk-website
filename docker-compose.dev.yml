@@ -1,18 +1,18 @@
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: strapi-postgres
+    container_name: strapi-postgres-dev
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data-dev:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
-      - stuk-network
+      - stuk-network-dev
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME} -d ${DATABASE_NAME}"]
       interval: 10s
@@ -23,7 +23,7 @@ services:
     build:
       context: ./strapi-website
       dockerfile: Dockerfile.dev
-    container_name: strapi-app
+    container_name: strapi-app-dev
     restart: unless-stopped
     environment:
       HOST: ${HOST}
@@ -35,7 +35,7 @@ services:
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
       DATABASE_CLIENT: ${DATABASE_CLIENT}
       DATABASE_HOST: postgres
-      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_PORT: 5432
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USERNAME: ${DATABASE_USERNAME}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
@@ -48,9 +48,9 @@ services:
       - ./strapi-website/package.json:/opt/app/package.json
       - ./strapi-website/public/uploads:/opt/app/public/uploads
     ports:
-      - "1337:1337"
+      - "1338:1337"
     networks:
-      - stuk-network
+      - stuk-network-dev
     depends_on:
       postgres:
         condition: service_healthy
@@ -59,10 +59,10 @@ services:
     build:
       context: ./stuk-nuxt-app
       dockerfile: Dockerfile.dev
-    container_name: nuxt-app
+    container_name: nuxt-app-dev
     restart: unless-stopped
     environment:
-      NUXT_PUBLIC_STRAPI_URL: http://localhost:1337
+      NUXT_PUBLIC_STRAPI_URL: http://localhost:1338
       NUXT_STRAPI_URL_SERVER: http://strapi:1337
       NUXT_INVENTUR_PIN: ${NUXT_INVENTUR_PIN}
       NUXT_INVENTUR_API_TOKEN: ${NUXT_INVENTUR_API_TOKEN}
@@ -73,16 +73,16 @@ services:
       - ./stuk-nuxt-app:/app
       - /app/node_modules
     ports:
-      - "3000:3000"
-      - "24678:24678"
+      - "3001:3000"
+      - "24679:24678"
     networks:
-      - stuk-network
+      - stuk-network-dev
     depends_on:
       - strapi
 
 volumes:
-  postgres-data:
+  postgres-data-dev:
 
 networks:
-  stuk-network:
+  stuk-network-dev:
     driver: bridge
