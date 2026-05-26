@@ -1,0 +1,6 @@
+# Override für lokale Entwicklung auf dem Laptop
+# Usage: docker compose -f docker-compose.dev.yml -f docker-compose.local.yml up -d --build
+services:
+  nuxt:
+    environment:
+      NUXT_PUBLIC_STRAPI_URL: http://localhost:3002

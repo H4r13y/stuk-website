@@ -62,7 +62,7 @@ services:
     container_name: nuxt-app-dev
     restart: unless-stopped
     environment:
-      NUXT_PUBLIC_STRAPI_URL: http://localhost:1338
+      NUXT_PUBLIC_STRAPI_URL: https://dev.stuk-leipzig.de
       NUXT_STRAPI_URL_SERVER: http://strapi:1337
       NUXT_INVENTUR_PIN: ${NUXT_INVENTUR_PIN}
       NUXT_INVENTUR_API_TOKEN: ${NUXT_INVENTUR_API_TOKEN}
@@ -78,6 +78,20 @@ services:
     networks:
       - stuk-network-dev
     depends_on:
+      - strapi
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy-dev
+    restart: unless-stopped
+    ports:
+      - "3002:80"
+    volumes:
+      - ./Caddyfile.dev:/etc/caddy/Caddyfile:ro
+    networks:
+      - stuk-network-dev
+    depends_on:
+      - nuxt
       - strapi
 
 volumes:

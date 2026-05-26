@@ -1,0 +1,8 @@
+:80 {
+	# Strapi: Admin + API + Plugin-Routen
+	@strapi path /admin /admin/* /api/* /uploads/* /content-manager/* /content-type-builder/* /users-permissions/* /upload/* /email/* /i18n/* /strapi-calendar/*
+	reverse_proxy @strapi strapi:1337
+
+	# Alles andere → Nuxt
+	reverse_proxy nuxt:3000
+}
