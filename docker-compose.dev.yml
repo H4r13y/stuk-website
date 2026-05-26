@@ -64,6 +64,9 @@ services:
     environment:
       NUXT_PUBLIC_STRAPI_URL: http://localhost:1337
       NUXT_STRAPI_URL_SERVER: http://strapi:1337
+      NUXT_INVENTUR_PIN: ${NUXT_INVENTUR_PIN}
+      NUXT_INVENTUR_API_TOKEN: ${NUXT_INVENTUR_API_TOKEN}
+      EMAIL_STRAPI_TOKEN: ${EMAIL_STRAPI_TOKEN}
       CHOKIDAR_USEPOLLING: "true"
       WATCHPACK_POLLING: "true"
     volumes:
