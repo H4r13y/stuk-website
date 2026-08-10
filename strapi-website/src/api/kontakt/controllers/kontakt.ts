@@ -70,7 +70,7 @@ export default {
         booking: 'booking@stuk-leipzig.de',
         lost: 'fundsachen@stuk-leipzig.de',
         board: 'vorstand@stuk-leipzig.de',
-        join: 'mitmachen@stuk-leipzig.de',
+        join: 'mitgliederwerbung@stuk-leipzig.de',
         awareness: 'awareness@stuk-leipzig.de',
       };
 
