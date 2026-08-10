@@ -24,6 +24,11 @@ export default defineNuxtConfig({
     },
   },
 
+  /* Route Rules – Redirects */
+  routeRules: {
+    '/ueber-uns/mitglied-werden': { redirect: { to: '/mitmachen', statusCode: 301 } },
+  },
+
   modules: ['@nuxtjs/strapi', '@nuxtjs/turnstile'],
 
   /* Cloudflare Turnstile Konfiguration */
