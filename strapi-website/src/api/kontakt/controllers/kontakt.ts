@@ -200,7 +200,11 @@ export default {
           if (data.membershipStatus === 'member') {
             membershipLine = `Ehemaliges Mitglied (ca. Zeitraum: ${data.memberTime || 'nicht angegeben'})`;
           } else if (data.membershipStatus === 'nonMember') {
-            membershipLine = `Kein Mitglied – möchte trotzdem eingeladen werden, weil: ${data.nonMemberReason || 'keine Angabe'}`;
+            if (data.wantInviteAnyway) {
+              membershipLine = `Kein Mitglied – möchte trotzdem eingeladen werden, weil: ${data.nonMemberReason || 'keine Angabe'}`;
+            } else {
+              membershipLine = 'Kein Mitglied';
+            }
           }
 
           emailBody = `

@@ -67,10 +67,17 @@
             <input v-model="formData.memberTime" placeholder="z.B. 2008–2012">
           </div>
 
-          <!-- Bedingtes Feld: kein Mitglied -->
+          <!-- Bedingter Punkt: kein Mitglied -->
           <div v-if="formData.membershipStatus === 'nonMember'" class="input" style="grid-column:1/-1">
-            <label>Ich möchte trotzdem eingeladen werden, weil …</label>
-            <textarea v-model="formData.nonMemberReason" placeholder="Erzähl uns kurz, wie du mit dem StuK verbunden bist"></textarea>
+            <label class="check-row">
+              <input type="checkbox" v-model="formData.wantInviteAnyway">
+              <span>Ich möchte trotzdem eingeladen werden, weil …</span>
+            </label>
+            <textarea
+              v-if="formData.wantInviteAnyway"
+              v-model="formData.nonMemberReason"
+              placeholder="Erzähl uns kurz, wie du mit dem StuK verbunden bist"
+              style="margin-top:10px"></textarea>
           </div>
 
           <div class="input" style="grid-column:1/-1">
@@ -161,6 +168,7 @@ const formData = ref({
   planToAttend: false,
   membershipStatus: '',
   memberTime: '',
+  wantInviteAnyway: false,
   nonMemberReason: '',
   email: '',
   dsgvo: false,
@@ -169,7 +177,15 @@ const formData = ref({
 // Bedingte Felder leeren, wenn sich die Auswahl ändert
 watch(() => formData.value.membershipStatus, (status) => {
   if (status !== 'member') formData.value.memberTime = ''
-  if (status !== 'nonMember') formData.value.nonMemberReason = ''
+  if (status !== 'nonMember') {
+    formData.value.wantInviteAnyway = false
+    formData.value.nonMemberReason = ''
+  }
+})
+
+// Begründung leeren, wenn der Haken wieder entfernt wird
+watch(() => formData.value.wantInviteAnyway, (checked) => {
+  if (!checked) formData.value.nonMemberReason = ''
 })
 
 // Turnstile Token
@@ -250,6 +266,7 @@ async function submitForm() {
         planToAttend: false,
         membershipStatus: '',
         memberTime: '',
+        wantInviteAnyway: false,
         nonMemberReason: '',
         email: '',
         dsgvo: false,
