@@ -72,6 +72,8 @@ export default {
         board: 'vorstand@stuk-leipzig.de',
         join: 'mitgliederwerbung@stuk-leipzig.de',
         awareness: 'awareness@stuk-leipzig.de',
+        // Vor-Anmeldung 30. Geburtstag – vorerst zu Testzwecken an den Vorstand
+        bday30: 'vorstand@stuk-leipzig.de',
       };
 
       // const emailRecipients = {
@@ -97,6 +99,7 @@ export default {
         join: 'Neue Bewerbung',
         awareness: '[AWARENESS] Neue Meldung',
         pfand: 'Neue Pfand-Bewerbung',
+        bday30: 'Neue Vor-Anmeldung – 30. Geburtstag',
       };
 
       const subject = subjectMap[formType] || 'Neue Kontaktanfrage';
@@ -192,6 +195,29 @@ export default {
           `;
           break;
 
+        case 'bday30': {
+          let membershipLine = 'Keine Angabe';
+          if (data.membershipStatus === 'member') {
+            membershipLine = `Ehemaliges Mitglied (ca. Zeitraum: ${data.memberTime || 'nicht angegeben'})`;
+          } else if (data.membershipStatus === 'nonMember') {
+            membershipLine = `Kein Mitglied – möchte trotzdem eingeladen werden, weil: ${data.nonMemberReason || 'keine Angabe'}`;
+          }
+
+          emailBody = `
+<h2>Neue Vor-Anmeldung zur 30-Jahr-Feier</h2>
+<p><strong>Vorname &amp; Name:</strong> ${data.fullName}<br>
+<strong>Spitzname:</strong> ${data.nickname || 'Nicht angegeben'}<br>
+<strong>E-Mail:</strong> ${data.email}</p>
+<h3>Angaben</h3>
+<p><strong>Möchte eine Einladung zum 30. Geburtstag:</strong> ${data.wantInvitation ? 'Ja' : 'Nein'}<br>
+<strong>Plant teilzunehmen:</strong> ${data.planToAttend ? 'Ja' : 'Nein'}<br>
+<strong>Mitgliedschaft:</strong> ${membershipLine}</p>
+<hr>
+<p><em>HINWEIS: Vor-Anmeldung über die Seite /einladung-30-bday. Empfänger aktuell zu Testzwecken: vorstand@stuk-leipzig.de.</em></p>
+          `;
+          break;
+        }
+
         default:
           emailBody = `
 <h2>Neue Kontaktanfrage</h2>
@@ -217,6 +243,7 @@ export default {
           board: 'Vielen Dank für deine Nachricht an den Vorstand. Wir melden uns bald.',
           join: 'Vielen Dank für dein Interesse am StuK! Wir melden uns zeitnah bei dir.',
           pfand: 'Vielen Dank für dein Interesse am StuK! Wir melden uns zeitnah bei dir.',
+          bday30: 'Vielen Dank für deine Vor-Anmeldung zur 30-Jahr-Feier! Wir haben dich vorgemerkt und melden uns mit allen Infos zur Feier bei dir.',
         };
 
         const confirmationText = confirmationMessages[formType] || 'Vielen Dank für deine Nachricht!';
@@ -226,7 +253,7 @@ export default {
           from: process.env.SMTP_DEFAULT_FROM || 'kontakt@stuk-leipzig.de',
           subject: `Bestätigung: ${subject}`,
           html: `
-<p>Hallo ${data.name || 'liebe/r Interessent/in'},</p>
+<p>Hallo ${data.name || data.fullName || 'liebe/r Interessent/in'},</p>
 <p>${confirmationText}</p>
 <p>Deine Anfrage wurde erfolgreich bei uns eingereicht.</p>
 <p>Viele Grüße<br>
