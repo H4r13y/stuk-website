@@ -21,8 +21,8 @@ const viewMode = ref<'gross' | 'kompakt'>('gross')
 export function useInventur() {
   const config = useRuntimeConfig()
   const strapiUrl = config.public.strapiUrl as string
-  const apiToken = config.public.inventurApiToken as string
-  const pin = config.public.inventurPin as string
+  const apiToken = 'ccf71576682c113dd3bbe70b635da450e18463e3273f3ce4900637d2253433c51c9b76a53483eab7c5a1dbbf65384b83f808f4ada6866d09fe7980a36f25d580e2682d7b9fc49df134836911556c7050c78c07777c4dcce6a650071759a9dcb8c7a37a612b0cc0429047c98a4a388223995ad9e2332a76fb1443f30ea2535b66'
+  const pin = '1234'
 
   // --- Auth Headers (für alle API-Calls) ---
   function authHeaders(): Record<string, string> {
